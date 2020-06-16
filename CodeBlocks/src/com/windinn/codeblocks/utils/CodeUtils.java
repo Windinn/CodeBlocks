@@ -2,6 +2,7 @@ package com.windinn.codeblocks.utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -49,17 +50,25 @@ public final class CodeUtils {
 	}
 
 	public static void removeEvent(Block block, Plot plot) {
-		JavaPlugin plugin = JavaPlugin.getPlugin(CodeBlocks.class);
-		List<String> events = getEvents();
-		events.remove(LocationUtils.locationToString(block.getLocation(), plot));
-		plugin.getConfig().set("eventBlocks", events);
-		plugin.saveConfig();
+		removeEvent(block, plot.getId().getX(), plot.getId().getY());
 	}
 
 	public static void removeEvent(Block block, int plotIdX, int plotIdY) {
 		JavaPlugin plugin = JavaPlugin.getPlugin(CodeBlocks.class);
 		List<String> events = getEvents();
-		events.remove(LocationUtils.locationToString(block.getLocation(), plotIdX, plotIdY));
+		Iterator<String> iterator = events.iterator();
+
+		while (iterator.hasNext()) {
+			String locationStr = iterator.next();
+			CustomLocation location = LocationUtils.stringToLocation(locationStr);
+
+			if (location.getLocation().equals(block.getLocation()) && location.getPlotIdX() == plotIdX
+					&& location.getPlotIdY() == plotIdY) {
+				iterator.remove();
+			}
+
+		}
+
 		plugin.getConfig().set("eventBlocks", events);
 		plugin.saveConfig();
 	}
