@@ -1,0 +1,12 @@
+main: com.windinn.codeblocks.CodeBlocks
+name: CodeBlocks
+version: 1.0
+api-version: 1.15
+author: Windinn, TalvorGames
+description: Add code blocks to your PlotSquared world!
+softdepend: [PlotSquared, WorldEdit]
+commands:
+
+  code:
+    description: Toggle coding mode.
+    permission: codeblocks.use
