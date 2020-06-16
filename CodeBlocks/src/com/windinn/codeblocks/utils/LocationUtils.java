@@ -12,8 +12,12 @@ public final class LocationUtils {
 	}
 
 	public static String locationToString(Location location, Plot plot) {
+		return locationToString(location, plot.getId().getX(), plot.getId().getY());
+	}
+
+	public static String locationToString(Location location, int plotIdX, int plotIdY) {
 		return location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ() + " "
-				+ location.getWorld().getName() + " " + plot.getId().getX() + " " + plot.getId().getY();
+				+ location.getWorld().getName() + " " + plotIdX + " " + plotIdY;
 	}
 
 	public static CustomLocation stringToLocation(String string) {

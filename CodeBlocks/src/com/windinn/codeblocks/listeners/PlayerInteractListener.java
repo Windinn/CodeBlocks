@@ -14,7 +14,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.plotsquared.core.player.PlotPlayer;
 import com.windinn.codeblocks.utils.CodeUtils;
+import com.windinn.codeblocks.utils.EventType;
 import com.windinn.codeblocks.utils.GuiUtils;
 
 public class PlayerInteractListener implements Listener {
@@ -50,6 +52,11 @@ public class PlayerInteractListener implements Listener {
 
 		}
 
+		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
+			PlotPlayer plotPlayer = PlotPlayer.get(player.getName());
+			CodeUtils.execute(player, EventType.PLAYER_INTERACT, plotPlayer.getCurrentPlot());
+		}
+
 		if (event.getClickedBlock() == null) {
 			return;
 		}
@@ -68,6 +75,13 @@ public class PlayerInteractListener implements Listener {
 
 				inventory.addItem(GuiUtils.createItem(Material.PAPER, ChatColor.GREEN + "Player Join Plot",
 						ChatColor.GRAY + "This event is fired when a player joins your plot."));
+
+				inventory.addItem(GuiUtils.createItem(Material.STICK, ChatColor.GREEN + "Player Interact",
+						ChatColor.GRAY + "This event is fired when:",
+						ChatColor.GRAY + "A player right clicks or left clicks a block / an item"));
+
+				inventory.addItem(GuiUtils.createItem(Material.GOLDEN_BOOTS, ChatColor.GREEN + "Player Move",
+						ChatColor.GRAY + "This event is fired when a player moves."));
 
 				player.openInventory(inventory);
 				CodeUtils.savedSigns.put(player, block);

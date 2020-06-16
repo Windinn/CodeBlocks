@@ -10,6 +10,7 @@ import com.windinn.codeblocks.listeners.BlockPlaceListener;
 import com.windinn.codeblocks.listeners.InventoryClickListener;
 import com.windinn.codeblocks.listeners.PlayerInteractListener;
 import com.windinn.codeblocks.listeners.PlayerJoinListener;
+import com.windinn.codeblocks.listeners.PlayerMoveListener;
 import com.windinn.codeblocks.listeners.PlotListener;
 
 public class CodeBlocks extends JavaPlugin {
@@ -28,6 +29,7 @@ public class CodeBlocks extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
 		getServer().getPluginManager().registerEvents(new PlayerInteractListener(), this);
 		getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+		getServer().getPluginManager().registerEvents(new PlayerMoveListener(), this);
 
 		PlotAPI plotApi = new PlotAPI();
 		plotApi.registerListener(new PlotListener());

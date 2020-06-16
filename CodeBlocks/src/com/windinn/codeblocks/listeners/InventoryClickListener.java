@@ -79,6 +79,20 @@ public class InventoryClickListener implements Listener {
 				sign.setLine(2, null);
 
 				sign.update();
+			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Player Interact")) {
+				Sign sign = (Sign) signBlock.getState();
+
+				sign.setLine(1, ChatColor.WHITE + "Player Interact");
+				sign.setLine(2, null);
+
+				sign.update();
+			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Player Move")) {
+				Sign sign = (Sign) signBlock.getState();
+
+				sign.setLine(1, ChatColor.WHITE + "Player Move");
+				sign.setLine(2, null);
+
+				sign.update();
 			}
 
 			player.closeInventory();

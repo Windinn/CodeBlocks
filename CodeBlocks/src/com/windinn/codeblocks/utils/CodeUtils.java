@@ -56,6 +56,14 @@ public final class CodeUtils {
 		plugin.saveConfig();
 	}
 
+	public static void removeEvent(Block block, int plotIdX, int plotIdY) {
+		JavaPlugin plugin = JavaPlugin.getPlugin(CodeBlocks.class);
+		List<String> events = getEvents();
+		events.remove(LocationUtils.locationToString(block.getLocation(), plotIdX, plotIdY));
+		plugin.getConfig().set("eventBlocks", events);
+		plugin.saveConfig();
+	}
+
 	public static List<String> getEvents() {
 		JavaPlugin plugin = JavaPlugin.getPlugin(CodeBlocks.class);
 		List<String> locations = plugin.getConfig().getStringList("eventBlocks");
@@ -69,29 +77,58 @@ public final class CodeUtils {
 
 	public static void execute(Player player, EventType event, Plot plot) {
 
-		if (event == EventType.PLAYER_JOIN_PLOT) {
+		if (plot == null) {
+			return;
+		}
 
-			for (String eventBlock : getEvents()) {
-				CustomLocation loc = LocationUtils.stringToLocation(eventBlock);
+		for (String eventBlock : getEvents()) {
+			CustomLocation loc = LocationUtils.stringToLocation(eventBlock);
 
-				if (plot.getId().getX() != loc.getPlotIdX() || plot.getId().getY() != loc.getPlotIdY()) {
-					return;
-				}
+			if (plot.getId().getX() != loc.getPlotIdX() || plot.getId().getY() != loc.getPlotIdY()) {
+				continue;
+			}
 
-				Location realLoc = loc.getLocation();
+			Location realLoc = loc.getLocation();
 
-				for (int z = realLoc.getBlockZ(); true; z--) {
-					Block block = new Location(realLoc.getWorld(), realLoc.getX(), realLoc.getY(), z).getBlock();
+			if (realLoc.getBlock().getType() != Material.DIAMOND_BLOCK) {
+				removeEvent(realLoc.getBlock(), loc.getPlotIdX(), loc.getPlotIdY());
+				continue;
+			}
 
-					if (block.getType() == Material.AIR) {
-						break;
-					} else if (block.getType() == Material.COBBLESTONE) {
-						Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
+			Block eventSignBlock = realLoc.getBlock().getRelative(BlockFace.EAST);
 
-						if (sign.getLine(0).equals(ChatColor.GOLD + "ACTION")) {
-							doAction(sign, player);
-						}
+			if (eventSignBlock.getType() != Material.OAK_WALL_SIGN) {
+				removeEvent(realLoc.getBlock(), loc.getPlotIdX(), loc.getPlotIdY());
+				continue;
+			}
 
+			Sign eventSign = (Sign) eventSignBlock.getState();
+			boolean pass = false;
+
+			if (event == EventType.PLAYER_JOIN_PLOT
+					&& eventSign.getLine(1).equals(ChatColor.WHITE + "Player Join Plot")) {
+				pass = true;
+			} else if (event == EventType.PLAYER_INTERACT
+					&& eventSign.getLine(1).equals(ChatColor.WHITE + "Player Interact")) {
+				pass = true;
+			} else if (event == EventType.PLAYER_MOVE && eventSign.getLine(1).equals(ChatColor.WHITE + "Player Move")) {
+				pass = true;
+			}
+
+			if (!pass) {
+				continue;
+			}
+
+			for (int z = realLoc.getBlockZ(); true; z--) {
+				Block block = new Location(realLoc.getWorld(), realLoc.getX(), realLoc.getY(), z).getBlock();
+
+				if (block.getType() == Material.AIR) {
+					break;
+				} else if (block.getType() == Material.COBBLESTONE) {
+					Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
+
+					if (sign.getLine(0).equals(ChatColor.GOLD + "ACTION")) {
+						doAction(sign, player);
 					}
 
 				}

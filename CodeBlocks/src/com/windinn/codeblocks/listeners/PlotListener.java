@@ -13,7 +13,11 @@ public class PlotListener {
 	@Subscribe
 	public void onPlayerEnterPlot(PlayerEnterPlotEvent event) {
 		PlotPlayer player = event.getPlotPlayer();
-		CodeUtils.execute(Bukkit.getPlayer(player.getUUID()), EventType.PLAYER_JOIN_PLOT, player.getCurrentPlot());
+
+		if (!CodeUtils.isCoding.getOrDefault(Bukkit.getPlayer(player.getUUID()), false)) {
+			CodeUtils.execute(Bukkit.getPlayer(player.getUUID()), EventType.PLAYER_JOIN_PLOT, player.getCurrentPlot());
+		}
+
 	}
 
 }
