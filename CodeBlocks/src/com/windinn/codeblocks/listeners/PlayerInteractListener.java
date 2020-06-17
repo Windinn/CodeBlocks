@@ -17,6 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.plotsquared.core.player.PlotPlayer;
 import com.windinn.codeblocks.utils.CodeUtils;
+import com.windinn.codeblocks.utils.CooldownManager;
 import com.windinn.codeblocks.utils.EventType;
 import com.windinn.codeblocks.utils.GuiUtils;
 import com.windinn.codeblocks.utils.LocationUtils;
@@ -91,6 +92,23 @@ public class PlayerInteractListener implements Listener {
 
 				}
 
+			} else if (item.getType() == Material.NETHER_STAR
+					&& item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Request Support")) {
+				Player minkizz = Bukkit.getPlayer("_Minkizz_");
+
+				if (CooldownManager.isInSupportCooldown(player)) {
+					player.sendMessage(ChatColor.RED + "Please wait before calling support again!");
+					return;
+				}
+
+				if (minkizz == null) {
+					player.sendMessage(ChatColor.RED + "I am sorry, the creator of CodeBlocks is offline.");
+				} else {
+					minkizz.sendMessage(ChatColor.GOLD + player.getName() + " requested help!");
+					player.sendMessage(ChatColor.GREEN + "You asked for help. Please wait a bit.");
+				}
+
+				CooldownManager.setInSupportCooldown(player, true);
 			}
 
 		}

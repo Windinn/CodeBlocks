@@ -47,6 +47,11 @@ public class CodeCommand implements CommandExecutor {
 										ChatColor.GRAY + "Use this do an action on the player.",
 										ChatColor.GRAY + "Exemple: set the gamemode of the player to survival."));
 
+						player.getInventory().setItem(7,
+								GuiUtils.createItem(Material.NETHER_STAR, ChatColor.GREEN + "Request Support",
+										ChatColor.GRAY + "Do you need help? Request support!",
+										ChatColor.GRAY + "The CREATOR of CodeBlocks will come help you!"));
+
 						player.getInventory().setItem(8,
 								GuiUtils.createItem(Material.MAGMA_CREAM, ChatColor.GOLD + "Variables",
 										ChatColor.GRAY + "Variables are used to answer to a question (WHAT, WHY, WHO).",
