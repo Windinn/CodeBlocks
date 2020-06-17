@@ -13,11 +13,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import com.plotsquared.core.player.PlotPlayer;
 import com.windinn.codeblocks.utils.CodeUtils;
 import com.windinn.codeblocks.utils.EventType;
 import com.windinn.codeblocks.utils.GuiUtils;
+import com.windinn.codeblocks.utils.LocationUtils;
 
 public class PlayerInteractListener implements Listener {
 
@@ -39,11 +41,52 @@ public class PlayerInteractListener implements Listener {
 					if (item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Variables")) {
 						Inventory inventory = Bukkit.createInventory(null, 9);
 
-						inventory.addItem(GuiUtils.createItem(Material.PAPER, ChatColor.RESET + "Text Value",
+						inventory.addItem(GuiUtils.createItem(Material.BOOK, ChatColor.RESET + "Text Value",
 								ChatColor.GRAY + "Say something in chat while holding the text variable",
 								ChatColor.GRAY + "to set the name of this variable"));
 
+						inventory.addItem(GuiUtils.createItem(Material.PAPER, ChatColor.RESET + "Location Value",
+								ChatColor.GRAY + "Right click a block or while in air",
+								ChatColor.GRAY + "To set the location value"));
+
 						player.openInventory(inventory);
+					}
+
+				}
+
+			} else if (item.getType() == Material.PAPER) {
+
+				if (item.getItemMeta().getLore() != null) {
+
+					if (item.getItemMeta().getLore().get(0)
+							.equals(ChatColor.GRAY + "Right click a block or while in air")) {
+
+						if (item.getItemMeta().getLore().size() >= 2) {
+
+							if (item.getItemMeta().getLore().get(1)
+									.equals(ChatColor.GRAY + "To set the location value")) {
+
+								if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+									ItemMeta meta = item.getItemMeta();
+									meta.setDisplayName(ChatColor.RESET + LocationUtils
+											.simpleLocationToString(event.getClickedBlock().getLocation()));
+									item.setItemMeta(meta);
+									player.sendMessage(
+											ChatColor.GREEN + "The location value has been set to " + LocationUtils
+													.simpleLocationToString(event.getClickedBlock().getLocation()));
+								} else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
+									ItemMeta meta = item.getItemMeta();
+									meta.setDisplayName(ChatColor.RESET
+											+ LocationUtils.simpleLocationToString(player.getLocation()));
+									item.setItemMeta(meta);
+									player.sendMessage(ChatColor.GREEN + "The location value has been set to "
+											+ LocationUtils.simpleLocationToString(player.getLocation()));
+								}
+
+							}
+
+						}
+
 					}
 
 				}
@@ -54,7 +97,11 @@ public class PlayerInteractListener implements Listener {
 
 		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
 			PlotPlayer plotPlayer = PlotPlayer.get(player.getName());
-			CodeUtils.execute(player, EventType.PLAYER_INTERACT, plotPlayer.getCurrentPlot());
+
+			if (plotPlayer != null) {
+				CodeUtils.execute(player, EventType.PLAYER_INTERACT, plotPlayer.getCurrentPlot());
+			}
+
 		}
 
 		if (event.getClickedBlock() == null) {
@@ -97,6 +144,10 @@ public class PlayerInteractListener implements Listener {
 				inventory.addItem(GuiUtils.createItem(Material.BOOK, ChatColor.GREEN + "Send Message",
 						ChatColor.GRAY + "This action sends a Text Value to the player.",
 						ChatColor.GRAY + "You must put a Text Value inside the chest for it to work."));
+
+				inventory.addItem(GuiUtils.createItem(Material.ENDER_PEARL, ChatColor.GREEN + "Teleport",
+						ChatColor.GRAY + "This action teleports a player",
+						ChatColor.GRAY + "To the Location Value found inside the chest."));
 
 				player.openInventory(inventory);
 				CodeUtils.savedSigns.put(player, block);

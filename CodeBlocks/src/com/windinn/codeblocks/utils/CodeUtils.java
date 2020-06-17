@@ -181,6 +181,28 @@ public final class CodeUtils {
 				player.sendMessage(message);
 			}
 
+		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Teleport")) {
+			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+			if (chestBlock.getType() == Material.CHEST) {
+				Chest chest = (Chest) chestBlock.getState();
+				Inventory inventory = chest.getInventory();
+				Location location;
+
+				if (inventory.getItem(0) == null) {
+					return;
+				}
+
+				location = LocationUtils.simpleStringToLocation(
+						ChatColor.stripColor(inventory.getItem(0).getItemMeta().getDisplayName()));
+
+				if (location == null) {
+					return;
+				}
+
+				player.teleport(location);
+			}
+
 		}
 
 	}

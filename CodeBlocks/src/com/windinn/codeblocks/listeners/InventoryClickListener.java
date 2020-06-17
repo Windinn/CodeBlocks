@@ -59,6 +59,13 @@ public class InventoryClickListener implements Listener {
 				sign.setLine(2, null);
 
 				sign.update();
+			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Teleport")) {
+				Sign sign = (Sign) signBlock.getState();
+
+				sign.setLine(1, ChatColor.WHITE + "Teleport");
+				sign.setLine(2, null);
+
+				sign.update();
 			}
 
 			player.closeInventory();

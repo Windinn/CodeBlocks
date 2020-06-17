@@ -21,7 +21,7 @@ public class AsyncPlayerChatListener implements Listener {
 			return;
 		}
 
-		if (item.getType() == Material.PAPER) {
+		if (item.getType() == Material.BOOK) {
 
 			if (item.hasItemMeta()) {
 
@@ -30,7 +30,7 @@ public class AsyncPlayerChatListener implements Listener {
 					if (item.getItemMeta().getLore().get(0)
 							.equals(ChatColor.GRAY + "Say something in chat while holding the text variable")) {
 
-						if (item.getItemMeta().getLore().get(1) != null) {
+						if (item.getItemMeta().getLore().size() >= 2) {
 
 							if (item.getItemMeta().getLore().get(1)
 									.equals(ChatColor.GRAY + "to set the name of this variable")) {

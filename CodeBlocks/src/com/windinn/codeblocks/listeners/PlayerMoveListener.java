@@ -16,6 +16,10 @@ public class PlayerMoveListener implements Listener {
 		Player player = event.getPlayer();
 		PlotPlayer plotPlayer = PlotPlayer.get(player.getName());
 
+		if (plotPlayer == null) {
+			return;
+		}
+
 		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
 			CodeUtils.execute(player, EventType.PLAYER_MOVE, plotPlayer.getCurrentPlot());
 		}

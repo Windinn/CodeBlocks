@@ -11,6 +11,11 @@ public final class LocationUtils {
 		throw new IllegalAccessError();
 	}
 
+	public static String simpleLocationToString(Location location) {
+		return location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ() + " "
+				+ location.getWorld().getName();
+	}
+
 	public static String locationToString(Location location, Plot plot) {
 		return locationToString(location, plot.getId().getX(), plot.getId().getY());
 	}
@@ -25,6 +30,13 @@ public final class LocationUtils {
 		Location location = new Location(Bukkit.getWorld(words[3]), Double.parseDouble(words[0]),
 				Double.parseDouble(words[1]), Double.parseDouble(words[2]));
 		return new CustomLocation(location, Integer.parseInt(words[4]), Integer.parseInt(words[5]));
+	}
+
+	public static Location simpleStringToLocation(String string) {
+		String[] words = string.split(" ");
+		Location location = new Location(Bukkit.getWorld(words[3]), Double.parseDouble(words[0]),
+				Double.parseDouble(words[1]), Double.parseDouble(words[2]));
+		return location;
 	}
 
 }
