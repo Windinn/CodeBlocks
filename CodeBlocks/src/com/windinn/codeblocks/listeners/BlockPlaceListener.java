@@ -1,6 +1,7 @@
 package com.windinn.codeblocks.listeners;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -16,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
+import com.plotsquared.core.plot.PlotArea;
 import com.windinn.codeblocks.utils.CodeUtils;
 
 public class BlockPlaceListener implements Listener {
@@ -35,11 +37,13 @@ public class BlockPlaceListener implements Listener {
 		}
 
 		PlotPlayer plotPlayer = PlotPlayer.get(player.getName());
+		Plot currentPlot = null;
 		boolean plotFound = false;
 
 		for (Plot plot : PlotSquared.get().getPlots(player.getUniqueId())) {
 
 			if (plot.equals(plotPlayer.getCurrentPlot())) {
+				currentPlot = plotPlayer.getCurrentPlot();
 				plotFound = true;
 				break;
 			}
@@ -48,6 +52,18 @@ public class BlockPlaceListener implements Listener {
 
 		if (!plotFound) {
 			player.sendMessage(ChatColor.RED + "You must code in your own plot!");
+			event.setCancelled(true);
+			return;
+		}
+
+		Location location = event.getBlock().getLocation();
+		PlotArea plotArea = PlotSquared.get().getPlotAreaAbs(new com.plotsquared.core.location.Location(
+				location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+		Plot plot = plotArea.getPlotAbs(new com.plotsquared.core.location.Location(location.getWorld().getName(),
+				location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+
+		if (plot != currentPlot) {
+			player.sendMessage(ChatColor.RED + "The location must be located in your plot!");
 			event.setCancelled(true);
 			return;
 		}

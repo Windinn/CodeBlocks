@@ -172,8 +172,8 @@ public final class CodeUtils {
 						continue;
 					}
 
-					if (item.getType() == Material.PAPER) {
-						message += item.getItemMeta().getDisplayName() + " ";
+					if (item.getType() == Material.BOOK) {
+						message += item.getItemMeta().getDisplayName();
 					}
 
 				}
@@ -221,6 +221,8 @@ public final class CodeUtils {
 
 			}
 
+		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Clear Inventory")) {
+			player.getInventory().clear();
 		}
 
 	}

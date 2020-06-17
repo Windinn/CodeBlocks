@@ -12,8 +12,8 @@ public final class LocationUtils {
 	}
 
 	public static String simpleLocationToString(Location location) {
-		return location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ() + " "
-				+ location.getWorld().getName();
+		return Math.round(location.getX() * 100f) / 100f + " " + Math.round(location.getY() * 100f) / 100f + " "
+				+ Math.round(location.getZ() * 100f) / 100f + " " + location.getWorld().getName();
 	}
 
 	public static String locationToString(Location location, Plot plot) {

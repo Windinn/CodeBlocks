@@ -2,6 +2,7 @@ package com.windinn.codeblocks.listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -15,7 +16,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.player.PlotPlayer;
+import com.plotsquared.core.plot.Plot;
+import com.plotsquared.core.plot.PlotArea;
 import com.windinn.codeblocks.utils.CodeUtils;
 import com.windinn.codeblocks.utils.CooldownManager;
 import com.windinn.codeblocks.utils.EventType;
@@ -28,6 +32,17 @@ public class PlayerInteractListener implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
+		Plot currentPlot = null;
+		PlotPlayer plotPlayer = PlotPlayer.get(player.getName());
+
+		for (Plot plot : PlotSquared.get().getPlots(player.getUniqueId())) {
+
+			if (plot.equals(plotPlayer.getCurrentPlot())) {
+				currentPlot = plotPlayer.getCurrentPlot();
+				break;
+			}
+
+		}
 
 		if (event.getHand() == EquipmentSlot.OFF_HAND) {
 			return;
@@ -66,15 +81,46 @@ public class PlayerInteractListener implements Listener {
 
 							if (item.getItemMeta().getLore().get(1)
 									.equals(ChatColor.GRAY + "To set the location value")) {
+								boolean plotFound = false;
+
+								for (Plot plot : PlotSquared.get().getPlots(player.getUniqueId())) {
+
+									if (plot.equals(plotPlayer.getCurrentPlot())) {
+										plotFound = true;
+										break;
+									}
+
+								}
+
+								if (!plotFound) {
+									player.sendMessage(ChatColor.RED + "The location must be located in your plot!");
+									event.setCancelled(true);
+									return;
+								}
 
 								if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+									Location location = event.getClickedBlock().getLocation();
+									PlotArea plotArea = PlotSquared.get()
+											.getPlotAreaAbs(new com.plotsquared.core.location.Location(
+													location.getWorld().getName(), location.getBlockX(),
+													location.getBlockY(), location.getBlockZ()));
+									Plot plot = plotArea.getPlotAbs(
+											new com.plotsquared.core.location.Location(location.getWorld().getName(),
+													location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+
+									if (plot != currentPlot) {
+										player.sendMessage(
+												ChatColor.RED + "The location must be located in your plot!");
+										event.setCancelled(true);
+										return;
+									}
+
 									ItemMeta meta = item.getItemMeta();
 									meta.setDisplayName(ChatColor.RESET + LocationUtils
 											.simpleLocationToString(event.getClickedBlock().getLocation()));
 									item.setItemMeta(meta);
-									player.sendMessage(
-											ChatColor.GREEN + "The location value has been set to " + LocationUtils
-													.simpleLocationToString(event.getClickedBlock().getLocation()));
+									player.sendMessage(ChatColor.GREEN + "The location value has been set to "
+											+ LocationUtils.simpleLocationToString(location));
 								} else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
 									ItemMeta meta = item.getItemMeta();
 									meta.setDisplayName(ChatColor.RESET
@@ -114,7 +160,6 @@ public class PlayerInteractListener implements Listener {
 		}
 
 		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
-			PlotPlayer plotPlayer = PlotPlayer.get(player.getName());
 
 			if (plotPlayer != null) {
 				CodeUtils.execute(player, EventType.PLAYER_INTERACT, plotPlayer.getCurrentPlot());
@@ -169,6 +214,9 @@ public class PlayerInteractListener implements Listener {
 
 				inventory.addItem(GuiUtils.createItem(Material.CHEST, ChatColor.GREEN + "Give Items",
 						ChatColor.GRAY + "This action gives all items", ChatColor.GRAY + "In chest to a player"));
+
+				inventory.addItem(GuiUtils.createItem(Material.BARRIER, ChatColor.GREEN + "Clear Inventory",
+						ChatColor.GRAY + "This action clears the inventory of a player."));
 
 				player.openInventory(inventory);
 				CodeUtils.savedSigns.put(player, block);
