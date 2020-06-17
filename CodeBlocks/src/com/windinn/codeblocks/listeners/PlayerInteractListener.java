@@ -149,6 +149,9 @@ public class PlayerInteractListener implements Listener {
 						ChatColor.GRAY + "This action teleports a player",
 						ChatColor.GRAY + "To the Location Value found inside the chest."));
 
+				inventory.addItem(GuiUtils.createItem(Material.CHEST, ChatColor.GREEN + "Give Items",
+						ChatColor.GRAY + "This action gives all items", ChatColor.GRAY + "In chest to a player"));
+
 				player.openInventory(inventory);
 				CodeUtils.savedSigns.put(player, block);
 			}

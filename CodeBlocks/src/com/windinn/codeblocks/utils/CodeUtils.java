@@ -203,6 +203,24 @@ public final class CodeUtils {
 				player.teleport(location);
 			}
 
+		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Give Items")) {
+			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+			if (chestBlock.getType() == Material.CHEST) {
+				Chest chest = (Chest) chestBlock.getState();
+				Inventory inventory = chest.getInventory();
+
+				for (ItemStack item : inventory.getContents()) {
+
+					if (item == null) {
+						continue;
+					}
+
+					player.getInventory().addItem(item);
+				}
+
+			}
+
 		}
 
 	}
