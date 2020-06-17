@@ -122,6 +122,12 @@ public final class CodeUtils {
 				pass = true;
 			} else if (event == EventType.PLAYER_MOVE && eventSign.getLine(1).equals(ChatColor.WHITE + "Player Move")) {
 				pass = true;
+			} else if (event == EventType.PLAYER_LEFT_CLICK
+					&& eventSign.getLine(1).equals(ChatColor.WHITE + "Player Left Click")) {
+				pass = true;
+			} else if (event == EventType.PLAYER_RIGHT_CLICK
+					&& eventSign.getLine(1).equals(ChatColor.WHITE + "Player Right Click")) {
+				pass = true;
 			}
 
 			if (!pass) {
@@ -188,13 +194,24 @@ public final class CodeUtils {
 				Chest chest = (Chest) chestBlock.getState();
 				Inventory inventory = chest.getInventory();
 				Location location;
+				ItemStack item = null;
 
-				if (inventory.getItem(0) == null) {
+				for (ItemStack content : inventory.getContents()) {
+
+					if (content == null) {
+						continue;
+					}
+
+					item = content;
+					break;
+				}
+
+				if (item == null) {
 					return;
 				}
 
-				location = LocationUtils.simpleStringToLocation(
-						ChatColor.stripColor(inventory.getItem(0).getItemMeta().getDisplayName()));
+				location = LocationUtils
+						.simpleStringToLocation(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
 
 				if (location == null) {
 					return;
@@ -223,6 +240,42 @@ public final class CodeUtils {
 
 		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Clear Inventory")) {
 			player.getInventory().clear();
+		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Set Health")) {
+			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+			if (chestBlock.getType() == Material.CHEST) {
+				Chest chest = (Chest) chestBlock.getState();
+				Inventory inventory = chest.getInventory();
+				ItemStack item = null;
+				double health = 0d;
+
+				for (ItemStack content : inventory.getContents()) {
+
+					if (content == null) {
+						continue;
+					}
+
+					if (content.getType() != Material.SLIME_BALL) {
+						continue;
+					}
+
+					item = content;
+					break;
+				}
+
+				if (item == null) {
+					return;
+				}
+
+				try {
+					health = Double.parseDouble(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
+				} catch (NumberFormatException exception) {
+					return;
+				}
+
+				player.setHealth(health);
+			}
+
 		}
 
 	}

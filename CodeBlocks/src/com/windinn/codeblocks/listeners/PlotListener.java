@@ -2,6 +2,7 @@ package com.windinn.codeblocks.listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 import com.google.common.eventbus.Subscribe;
@@ -16,6 +17,8 @@ public class PlotListener {
 	@Subscribe
 	public void onPlayerEnterPlot(PlayerEnterPlotEvent event) {
 		PlotPlayer player = event.getPlotPlayer();
+		Player bukkitPlayer = Bukkit.getPlayer(player.getUUID());
+		bukkitPlayer.setGameMode(GameMode.CREATIVE);
 
 		if (!CodeUtils.isCoding.getOrDefault(Bukkit.getPlayer(player.getUUID()), false)) {
 			CodeUtils.execute(Bukkit.getPlayer(player.getUUID()), EventType.PLAYER_JOIN_PLOT, player.getCurrentPlot());
@@ -26,6 +29,7 @@ public class PlotListener {
 	@Subscribe
 	public void onPlayerLeavePlot(PlayerLeavePlotEvent event) {
 		Player player = Bukkit.getPlayer(event.getPlotPlayer().getUUID());
+		player.setGameMode(GameMode.CREATIVE);
 
 		if (CodeUtils.isCoding.getOrDefault(player, false)) {
 			CodeUtils.isCoding.put(player, false);

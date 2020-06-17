@@ -49,6 +49,43 @@ public class AsyncPlayerChatListener implements Listener {
 
 			}
 
+		} else if (item.getType() == Material.SLIME_BALL) {
+
+			if (item.hasItemMeta()) {
+
+				if (item.getItemMeta().getLore() != null) {
+
+					if (item.getItemMeta().getLore().get(0)
+							.equals(ChatColor.GRAY + "Say something a number in chat while holding the variable")) {
+
+						if (item.getItemMeta().getLore().size() >= 2) {
+
+							if (item.getItemMeta().getLore().get(1)
+									.equals(ChatColor.GRAY + "to set the value of the variable.")) {
+								ItemMeta meta = item.getItemMeta();
+								String name = ChatColor.translateAlternateColorCodes('&', message);
+
+								try {
+									Double.parseDouble(name);
+								} catch (NumberFormatException exception) {
+									player.sendMessage(ChatColor.RED + "This is not a number!");
+									event.setCancelled(true);
+									return;
+								}
+
+								meta.setDisplayName(ChatColor.RESET + name);
+								item.setItemMeta(meta);
+								event.setCancelled(true);
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
 		}
 
 	}

@@ -65,7 +65,12 @@ public class PlayerInteractListener implements Listener {
 								ChatColor.GRAY + "Right click a block or while in air",
 								ChatColor.GRAY + "To set the location value"));
 
+						inventory.addItem(GuiUtils.createItem(Material.SLIME_BALL, ChatColor.RESET + "Number Value",
+								ChatColor.GRAY + "Say something a number in chat while holding the variable",
+								ChatColor.GRAY + "to set the value of the variable."));
+
 						player.openInventory(inventory);
+						event.setCancelled(true);
 					}
 
 				}
@@ -121,6 +126,7 @@ public class PlayerInteractListener implements Listener {
 									item.setItemMeta(meta);
 									player.sendMessage(ChatColor.GREEN + "The location value has been set to "
 											+ LocationUtils.simpleLocationToString(location));
+									event.setCancelled(true);
 								} else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
 									ItemMeta meta = item.getItemMeta();
 									meta.setDisplayName(ChatColor.RESET
@@ -128,6 +134,7 @@ public class PlayerInteractListener implements Listener {
 									item.setItemMeta(meta);
 									player.sendMessage(ChatColor.GREEN + "The location value has been set to "
 											+ LocationUtils.simpleLocationToString(player.getLocation()));
+									event.setCancelled(true);
 								}
 
 							}
@@ -162,6 +169,13 @@ public class PlayerInteractListener implements Listener {
 		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
 
 			if (plotPlayer != null) {
+
+				if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+					CodeUtils.execute(player, EventType.PLAYER_RIGHT_CLICK, plotPlayer.getCurrentPlot());
+				} else if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+					CodeUtils.execute(player, EventType.PLAYER_LEFT_CLICK, plotPlayer.getCurrentPlot());
+				}
+
 				CodeUtils.execute(player, EventType.PLAYER_INTERACT, plotPlayer.getCurrentPlot());
 			}
 
@@ -193,6 +207,14 @@ public class PlayerInteractListener implements Listener {
 				inventory.addItem(GuiUtils.createItem(Material.GOLDEN_BOOTS, ChatColor.GREEN + "Player Move",
 						ChatColor.GRAY + "This event is fired when a player moves."));
 
+				inventory.addItem(GuiUtils.createItem(Material.COAL, ChatColor.GREEN + "Player Right Click",
+						ChatColor.GRAY + "This event is fired when:",
+						ChatColor.GRAY + "A player right clicks a block or an item"));
+
+				inventory.addItem(GuiUtils.createItem(Material.CHARCOAL, ChatColor.GREEN + "Player Left Click",
+						ChatColor.GRAY + "This event is fired when:",
+						ChatColor.GRAY + "A player left clicks a block or an item"));
+
 				player.openInventory(inventory);
 				CodeUtils.savedSigns.put(player, block);
 			} else if (sign.getLine(0).equals(ChatColor.GOLD + "ACTION")) {
@@ -217,6 +239,10 @@ public class PlayerInteractListener implements Listener {
 
 				inventory.addItem(GuiUtils.createItem(Material.BARRIER, ChatColor.GREEN + "Clear Inventory",
 						ChatColor.GRAY + "This action clears the inventory of a player."));
+
+				inventory.addItem(GuiUtils.createItem(Material.RED_WOOL, ChatColor.GREEN + "Set Health",
+						ChatColor.GRAY + "This action sets the health of the player.",
+						ChatColor.GRAY + "You must put a Number Value for it to work."));
 
 				player.openInventory(inventory);
 				CodeUtils.savedSigns.put(player, block);
