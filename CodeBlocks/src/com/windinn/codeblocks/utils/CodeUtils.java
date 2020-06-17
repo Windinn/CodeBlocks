@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -172,199 +173,208 @@ public final class CodeUtils {
 
 	private static void doAction(Sign sign, Player player) {
 
-		if (sign.getLine(1).equals(ChatColor.WHITE + "Set gamemode to:")) {
+		Bukkit.getScheduler().runTaskAsynchronously(JavaPlugin.getPlugin(CodeBlocks.class), new Runnable() {
 
-			if (sign.getLine(2).equals(ChatColor.WHITE + "Survival")) {
-				player.setGameMode(GameMode.SURVIVAL);
-			} else if (sign.getLine(2).equals(ChatColor.WHITE + "Creative")) {
-				player.setGameMode(GameMode.CREATIVE);
+			@Override
+			public void run() {
+
+				if (sign.getLine(1).equals(ChatColor.WHITE + "Set gamemode to:")) {
+
+					if (sign.getLine(2).equals(ChatColor.WHITE + "Survival")) {
+						player.setGameMode(GameMode.SURVIVAL);
+					} else if (sign.getLine(2).equals(ChatColor.WHITE + "Creative")) {
+						player.setGameMode(GameMode.CREATIVE);
+					}
+
+				} else if (sign.getLine(1).equals(ChatColor.WHITE + "Send Message")) {
+					Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+					if (chestBlock.getType() == Material.CHEST) {
+						Chest chest = (Chest) chestBlock.getState();
+						Inventory inventory = chest.getInventory();
+						String message = "";
+
+						for (ItemStack item : inventory.getContents()) {
+
+							if (item == null) {
+								continue;
+							}
+
+							if (item.getType() == Material.BOOK) {
+								message += item.getItemMeta().getDisplayName();
+							}
+
+						}
+
+						player.sendMessage(message);
+					}
+
+				} else if (sign.getLine(1).equals(ChatColor.WHITE + "Teleport")) {
+					Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+					if (chestBlock.getType() == Material.CHEST) {
+						Chest chest = (Chest) chestBlock.getState();
+						Inventory inventory = chest.getInventory();
+						Location location;
+						ItemStack item = null;
+
+						for (ItemStack content : inventory.getContents()) {
+
+							if (content == null) {
+								continue;
+							}
+
+							item = content;
+							break;
+						}
+
+						if (item == null) {
+							return;
+						}
+
+						location = LocationUtils
+								.simpleStringToLocation(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
+
+						if (location == null) {
+							return;
+						}
+
+						player.teleport(location);
+					}
+
+				} else if (sign.getLine(1).equals(ChatColor.WHITE + "Give Items")) {
+					Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+					if (chestBlock.getType() == Material.CHEST) {
+						Chest chest = (Chest) chestBlock.getState();
+						Inventory inventory = chest.getInventory();
+
+						for (ItemStack item : inventory.getContents()) {
+
+							if (item == null) {
+								continue;
+							}
+
+							player.getInventory().addItem(item);
+						}
+
+					}
+
+				} else if (sign.getLine(1).equals(ChatColor.WHITE + "Clear Inventory")) {
+					player.getInventory().clear();
+				} else if (sign.getLine(1).equals(ChatColor.WHITE + "Set Health")) {
+					Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+					if (chestBlock.getType() == Material.CHEST) {
+						Chest chest = (Chest) chestBlock.getState();
+						Inventory inventory = chest.getInventory();
+						ItemStack item = null;
+						double health = 0d;
+
+						for (ItemStack content : inventory.getContents()) {
+
+							if (content == null) {
+								continue;
+							}
+
+							if (content.getType() != Material.SLIME_BALL) {
+								continue;
+							}
+
+							item = content;
+							break;
+						}
+
+						if (item == null) {
+							return;
+						}
+
+						try {
+							health = Double.parseDouble(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
+						} catch (NumberFormatException exception) {
+							return;
+						}
+
+						player.setHealth(health);
+					}
+
+				} else if (sign.getLine(1).equals(ChatColor.WHITE + "Set Max Health")) {
+					Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+					if (chestBlock.getType() == Material.CHEST) {
+						Chest chest = (Chest) chestBlock.getState();
+						Inventory inventory = chest.getInventory();
+						ItemStack item = null;
+						double health = 0d;
+
+						for (ItemStack content : inventory.getContents()) {
+
+							if (content == null) {
+								continue;
+							}
+
+							if (content.getType() != Material.SLIME_BALL) {
+								continue;
+							}
+
+							item = content;
+							break;
+						}
+
+						if (item == null) {
+							return;
+						}
+
+						try {
+							health = Double.parseDouble(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
+						} catch (NumberFormatException exception) {
+							return;
+						}
+
+						player.setMaxHealth(health);
+					}
+
+				} else if (sign.getLine(1).equals(ChatColor.WHITE + "Set XP Level")) {
+					Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+					if (chestBlock.getType() == Material.CHEST) {
+						Chest chest = (Chest) chestBlock.getState();
+						Inventory inventory = chest.getInventory();
+						ItemStack item = null;
+						double level = 0d;
+
+						for (ItemStack content : inventory.getContents()) {
+
+							if (content == null) {
+								continue;
+							}
+
+							if (content.getType() != Material.SLIME_BALL) {
+								continue;
+							}
+
+							item = content;
+							break;
+						}
+
+						if (item == null) {
+							return;
+						}
+
+						try {
+							level = Double.parseDouble(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
+						} catch (NumberFormatException exception) {
+							return;
+						}
+
+						player.setLevel((int) Math.round(level));
+					}
+
+				}
+
 			}
 
-		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Send Message")) {
-			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
-
-			if (chestBlock.getType() == Material.CHEST) {
-				Chest chest = (Chest) chestBlock.getState();
-				Inventory inventory = chest.getInventory();
-				String message = "";
-
-				for (ItemStack item : inventory.getContents()) {
-
-					if (item == null) {
-						continue;
-					}
-
-					if (item.getType() == Material.BOOK) {
-						message += item.getItemMeta().getDisplayName();
-					}
-
-				}
-
-				player.sendMessage(message);
-			}
-
-		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Teleport")) {
-			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
-
-			if (chestBlock.getType() == Material.CHEST) {
-				Chest chest = (Chest) chestBlock.getState();
-				Inventory inventory = chest.getInventory();
-				Location location;
-				ItemStack item = null;
-
-				for (ItemStack content : inventory.getContents()) {
-
-					if (content == null) {
-						continue;
-					}
-
-					item = content;
-					break;
-				}
-
-				if (item == null) {
-					return;
-				}
-
-				location = LocationUtils
-						.simpleStringToLocation(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
-
-				if (location == null) {
-					return;
-				}
-
-				player.teleport(location);
-			}
-
-		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Give Items")) {
-			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
-
-			if (chestBlock.getType() == Material.CHEST) {
-				Chest chest = (Chest) chestBlock.getState();
-				Inventory inventory = chest.getInventory();
-
-				for (ItemStack item : inventory.getContents()) {
-
-					if (item == null) {
-						continue;
-					}
-
-					player.getInventory().addItem(item);
-				}
-
-			}
-
-		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Clear Inventory")) {
-			player.getInventory().clear();
-		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Set Health")) {
-			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
-
-			if (chestBlock.getType() == Material.CHEST) {
-				Chest chest = (Chest) chestBlock.getState();
-				Inventory inventory = chest.getInventory();
-				ItemStack item = null;
-				double health = 0d;
-
-				for (ItemStack content : inventory.getContents()) {
-
-					if (content == null) {
-						continue;
-					}
-
-					if (content.getType() != Material.SLIME_BALL) {
-						continue;
-					}
-
-					item = content;
-					break;
-				}
-
-				if (item == null) {
-					return;
-				}
-
-				try {
-					health = Double.parseDouble(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
-				} catch (NumberFormatException exception) {
-					return;
-				}
-
-				player.setHealth(health);
-			}
-
-		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Set Max Health")) {
-			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
-
-			if (chestBlock.getType() == Material.CHEST) {
-				Chest chest = (Chest) chestBlock.getState();
-				Inventory inventory = chest.getInventory();
-				ItemStack item = null;
-				double health = 0d;
-
-				for (ItemStack content : inventory.getContents()) {
-
-					if (content == null) {
-						continue;
-					}
-
-					if (content.getType() != Material.SLIME_BALL) {
-						continue;
-					}
-
-					item = content;
-					break;
-				}
-
-				if (item == null) {
-					return;
-				}
-
-				try {
-					health = Double.parseDouble(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
-				} catch (NumberFormatException exception) {
-					return;
-				}
-
-				player.setMaxHealth(health);
-			}
-
-		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Set XP Level")) {
-			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
-
-			if (chestBlock.getType() == Material.CHEST) {
-				Chest chest = (Chest) chestBlock.getState();
-				Inventory inventory = chest.getInventory();
-				ItemStack item = null;
-				double level = 0d;
-
-				for (ItemStack content : inventory.getContents()) {
-
-					if (content == null) {
-						continue;
-					}
-
-					if (content.getType() != Material.SLIME_BALL) {
-						continue;
-					}
-
-					item = content;
-					break;
-				}
-
-				if (item == null) {
-					return;
-				}
-
-				try {
-					level = Double.parseDouble(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
-				} catch (NumberFormatException exception) {
-					return;
-				}
-
-				player.setLevel((int) Math.round(level));
-			}
-
-		}
+		});
 
 	}
 

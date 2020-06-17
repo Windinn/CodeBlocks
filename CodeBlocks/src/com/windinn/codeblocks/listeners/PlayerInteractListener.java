@@ -241,7 +241,8 @@ public class PlayerInteractListener implements Listener {
 						ChatColor.GRAY + "A player right clicks or left clicks a block / an item"));
 
 				inventory.addItem(GuiUtils.createItem(Material.GOLDEN_BOOTS, ChatColor.GREEN + "Player Move",
-						ChatColor.GRAY + "This event is fired when a player moves."));
+						ChatColor.GRAY + "This event is fired when a player moves.",
+						ChatColor.RED + "[!] Not cancellable"));
 
 				inventory.addItem(GuiUtils.createItem(Material.COAL, ChatColor.GREEN + "Player Right Click",
 						ChatColor.GRAY + "This event is fired when:",
