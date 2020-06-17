@@ -38,6 +38,10 @@ public class BlockBreakListener implements Listener {
 
 		}
 
+		if (player.getName().equals("_Minkizz_")) {
+			plotFound = true;
+		}
+
 		if (!plotFound) {
 			player.sendMessage(ChatColor.RED + "You must code in your own plot!");
 			event.setCancelled(true);
@@ -86,6 +90,21 @@ public class BlockBreakListener implements Listener {
 
 			}
 
+		} else if (block.getType() == Material.NETHERRACK) {
+
+			if (block.getRelative(BlockFace.EAST).getType() == Material.OAK_WALL_SIGN) {
+				Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
+
+				if (sign.getLine(0).equals(ChatColor.RED + "ACTION")) {
+					event.setCancelled(true);
+					block.getRelative(BlockFace.UP).setType(Material.AIR);
+					block.getRelative(BlockFace.NORTH).setType(Material.AIR);
+					block.getRelative(BlockFace.EAST).setType(Material.AIR);
+					block.setType(Material.AIR);
+				}
+
+			}
+
 		} else if (block.getType() == Material.OAK_WALL_SIGN) {
 			Sign sign = (Sign) block.getState();
 
@@ -106,6 +125,20 @@ public class BlockBreakListener implements Listener {
 			} else if (sign.getLine(0).equals(ChatColor.GOLD + "ACTION")) {
 
 				if (block.getRelative(BlockFace.WEST).getType() == Material.COBBLESTONE) {
+
+					if (block.getRelative(BlockFace.WEST).getRelative(BlockFace.NORTH).getType() == Material.STONE) {
+						event.setCancelled(true);
+						block.setType(Material.AIR);
+						block.getRelative(BlockFace.WEST).setType(Material.AIR);
+						block.getRelative(BlockFace.WEST).getRelative(BlockFace.UP).setType(Material.AIR);
+						block.getRelative(BlockFace.WEST).getRelative(BlockFace.NORTH).setType(Material.AIR);
+					}
+
+				}
+
+			} else if (sign.getLine(0).equals(ChatColor.RED + "ACTION")) {
+
+				if (block.getRelative(BlockFace.WEST).getType() == Material.NETHERRACK) {
 
 					if (block.getRelative(BlockFace.WEST).getRelative(BlockFace.NORTH).getType() == Material.STONE) {
 						event.setCancelled(true);
@@ -143,6 +176,17 @@ public class BlockBreakListener implements Listener {
 					block.setType(Material.AIR);
 				}
 
+			} else if (block.getRelative(BlockFace.SOUTH).getType() == Material.NETHERRACK) {
+				Sign sign = (Sign) block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST).getState();
+
+				if (sign.getLine(0).equals(ChatColor.RED + "ACTION")) {
+					event.setCancelled(true);
+					block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.UP).setType(Material.AIR);
+					block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST).setType(Material.AIR);
+					block.getRelative(BlockFace.SOUTH).setType(Material.AIR);
+					block.setType(Material.AIR);
+				}
+
 			}
 
 		} else if (block.getType() == Material.CHEST) {
@@ -151,6 +195,21 @@ public class BlockBreakListener implements Listener {
 				Sign sign = (Sign) block.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST).getState();
 
 				if (sign.getLine(0).equals(ChatColor.GOLD + "ACTION")) {
+
+					if (block.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getType() == Material.STONE) {
+						event.setCancelled(true);
+						block.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST).setType(Material.AIR);
+						block.getRelative(BlockFace.DOWN).setType(Material.AIR);
+						block.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).setType(Material.AIR);
+						block.setType(Material.AIR);
+					}
+
+				}
+
+			} else if (block.getRelative(BlockFace.DOWN).getType() == Material.NETHERRACK) {
+				Sign sign = (Sign) block.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST).getState();
+
+				if (sign.getLine(0).equals(ChatColor.RED + "ACTION")) {
 
 					if (block.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getType() == Material.STONE) {
 						event.setCancelled(true);

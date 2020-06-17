@@ -84,10 +84,11 @@ public final class CodeUtils {
 		return locations;
 	}
 
-	public static void execute(Player player, EventType event, Plot plot) {
+	public static boolean execute(Player player, EventType event, Plot plot) {
+		boolean cancel = false;
 
 		if (plot == null) {
-			return;
+			return false;
 		}
 
 		for (String eventBlock : getEvents()) {
@@ -128,6 +129,9 @@ public final class CodeUtils {
 			} else if (event == EventType.PLAYER_RIGHT_CLICK
 					&& eventSign.getLine(1).equals(ChatColor.WHITE + "Player Right Click")) {
 				pass = true;
+			} else if (event == EventType.PLAYER_DAMAGE
+					&& eventSign.getLine(1).equals(ChatColor.WHITE + "Player Damage")) {
+				pass = true;
 			}
 
 			if (!pass) {
@@ -146,12 +150,24 @@ public final class CodeUtils {
 						doAction(sign, player);
 					}
 
+				} else if (block.getType() == Material.NETHERRACK) {
+					Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
+
+					if (sign.getLine(0).equals(ChatColor.RED + "ACTION")) {
+
+						if (sign.getLine(1).equals(ChatColor.WHITE + "Cancel Event")) {
+							cancel = true;
+						}
+
+					}
+
 				}
 
 			}
 
 		}
 
+		return cancel;
 	}
 
 	private static void doAction(Sign sign, Player player) {
@@ -274,6 +290,78 @@ public final class CodeUtils {
 				}
 
 				player.setHealth(health);
+			}
+
+		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Set Max Health")) {
+			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+			if (chestBlock.getType() == Material.CHEST) {
+				Chest chest = (Chest) chestBlock.getState();
+				Inventory inventory = chest.getInventory();
+				ItemStack item = null;
+				double health = 0d;
+
+				for (ItemStack content : inventory.getContents()) {
+
+					if (content == null) {
+						continue;
+					}
+
+					if (content.getType() != Material.SLIME_BALL) {
+						continue;
+					}
+
+					item = content;
+					break;
+				}
+
+				if (item == null) {
+					return;
+				}
+
+				try {
+					health = Double.parseDouble(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
+				} catch (NumberFormatException exception) {
+					return;
+				}
+
+				player.setMaxHealth(health);
+			}
+
+		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Set XP Level")) {
+			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+			if (chestBlock.getType() == Material.CHEST) {
+				Chest chest = (Chest) chestBlock.getState();
+				Inventory inventory = chest.getInventory();
+				ItemStack item = null;
+				double level = 0d;
+
+				for (ItemStack content : inventory.getContents()) {
+
+					if (content == null) {
+						continue;
+					}
+
+					if (content.getType() != Material.SLIME_BALL) {
+						continue;
+					}
+
+					item = content;
+					break;
+				}
+
+				if (item == null) {
+					return;
+				}
+
+				try {
+					level = Double.parseDouble(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
+				} catch (NumberFormatException exception) {
+					return;
+				}
+
+				player.setLevel((int) Math.round(level));
 			}
 
 		}

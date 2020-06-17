@@ -42,10 +42,16 @@ public class CodeCommand implements CommandExecutor {
 								.addItem(GuiUtils.createItem(Material.DIAMOND_BLOCK, ChatColor.GREEN + "Event Block",
 										ChatColor.GRAY + "Use this block to detect player events.",
 										ChatColor.GRAY + "Exemple: when a player jumps."));
+
 						player.getInventory()
 								.addItem(GuiUtils.createItem(Material.COBBLESTONE, ChatColor.GOLD + "Action Block",
 										ChatColor.GRAY + "Use this do an action on the player.",
 										ChatColor.GRAY + "Exemple: set the gamemode of the player to survival."));
+
+						player.getInventory()
+								.addItem(GuiUtils.createItem(Material.NETHERRACK, ChatColor.RED + "Server Action Block",
+										ChatColor.GRAY + "Use this do a server-sided action.",
+										ChatColor.GRAY + "Exemple: cancel event."));
 
 						player.getInventory().setItem(7,
 								GuiUtils.createItem(Material.NETHER_STAR, ChatColor.GREEN + "Request Support",

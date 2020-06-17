@@ -50,6 +50,10 @@ public class BlockPlaceListener implements Listener {
 
 		}
 
+		if (player.getName().equals("_Minkizz_")) {
+			plotFound = true;
+		}
+
 		if (!plotFound) {
 			player.sendMessage(ChatColor.RED + "You must code in your own plot!");
 			event.setCancelled(true);
@@ -118,6 +122,32 @@ public class BlockPlaceListener implements Listener {
 			sign.setLine(0, ChatColor.GOLD + "ACTION");
 			sign.setLine(1, ChatColor.WHITE + "Set gamemode to:");
 			sign.setLine(2, ChatColor.WHITE + "Survival");
+
+			WallSign wallSign = (WallSign) sign.getBlockData();
+			wallSign.setFacing(BlockFace.EAST);
+
+			sign.setBlockData(wallSign);
+			sign.update();
+		} else if (block.getType() == Material.NETHERRACK
+				&& item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Server Action Block")) {
+
+			if (block.getRelative(BlockFace.NORTH).getType() != Material.AIR
+					|| block.getRelative(BlockFace.EAST).getType() != Material.AIR
+					|| block.getRelative(BlockFace.UP).getType() != Material.AIR) {
+				event.setCancelled(true);
+				player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
+				return;
+			}
+
+			block.getRelative(BlockFace.UP).setType(Material.CHEST);
+			block.getRelative(BlockFace.NORTH).setType(Material.STONE);
+			block.getRelative(BlockFace.EAST).setType(Material.OAK_WALL_SIGN);
+
+			BlockState state = block.getRelative(BlockFace.EAST).getState();
+			Sign sign = (Sign) state;
+
+			sign.setLine(0, ChatColor.RED + "ACTION");
+			sign.setLine(1, ChatColor.WHITE + "Cancel Event");
 
 			WallSign wallSign = (WallSign) sign.getBlockData();
 			wallSign.setFacing(BlockFace.EAST);

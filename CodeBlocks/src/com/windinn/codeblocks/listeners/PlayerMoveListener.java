@@ -21,7 +21,11 @@ public class PlayerMoveListener implements Listener {
 		}
 
 		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
-			CodeUtils.execute(player, EventType.PLAYER_MOVE, plotPlayer.getCurrentPlot());
+
+			if (CodeUtils.execute(player, EventType.PLAYER_MOVE, plotPlayer.getCurrentPlot())) {
+				event.setCancelled(true);
+			}
+
 		}
 
 	}

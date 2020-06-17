@@ -35,6 +35,7 @@ public class PlotListener {
 			CodeUtils.isCoding.put(player, false);
 
 			player.getInventory().clear();
+			player.setMaxHealth(20d);
 
 			player.sendMessage(ChatColor.RED + "You are not longer in coding mode.");
 		}

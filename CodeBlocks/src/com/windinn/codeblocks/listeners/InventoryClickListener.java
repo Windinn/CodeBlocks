@@ -87,6 +87,20 @@ public class InventoryClickListener implements Listener {
 				sign.setLine(2, null);
 
 				sign.update();
+			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Set Max Health")) {
+				Sign sign = (Sign) signBlock.getState();
+
+				sign.setLine(1, ChatColor.WHITE + "Set Max Health");
+				sign.setLine(2, null);
+
+				sign.update();
+			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Set XP Level")) {
+				Sign sign = (Sign) signBlock.getState();
+
+				sign.setLine(1, ChatColor.WHITE + "Set XP Level");
+				sign.setLine(2, null);
+
+				sign.update();
 			}
 
 			player.closeInventory();
@@ -132,6 +146,13 @@ public class InventoryClickListener implements Listener {
 				Sign sign = (Sign) signBlock.getState();
 
 				sign.setLine(1, ChatColor.WHITE + "Player Left Click");
+				sign.setLine(2, null);
+
+				sign.update();
+			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Player Damage")) {
+				Sign sign = (Sign) signBlock.getState();
+
+				sign.setLine(1, ChatColor.WHITE + "Player Damage");
 				sign.setLine(2, null);
 
 				sign.update();

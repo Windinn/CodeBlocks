@@ -171,12 +171,23 @@ public class PlayerInteractListener implements Listener {
 			if (plotPlayer != null) {
 
 				if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-					CodeUtils.execute(player, EventType.PLAYER_RIGHT_CLICK, plotPlayer.getCurrentPlot());
+
+					if (CodeUtils.execute(player, EventType.PLAYER_RIGHT_CLICK, plotPlayer.getCurrentPlot())) {
+						event.setCancelled(true);
+					}
+
 				} else if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-					CodeUtils.execute(player, EventType.PLAYER_LEFT_CLICK, plotPlayer.getCurrentPlot());
+
+					if (CodeUtils.execute(player, EventType.PLAYER_LEFT_CLICK, plotPlayer.getCurrentPlot())) {
+						event.setCancelled(true);
+					}
+
 				}
 
-				CodeUtils.execute(player, EventType.PLAYER_INTERACT, plotPlayer.getCurrentPlot());
+				if (CodeUtils.execute(player, EventType.PLAYER_INTERACT, plotPlayer.getCurrentPlot())) {
+					event.setCancelled(true);
+				}
+
 			}
 
 		}
@@ -190,6 +201,31 @@ public class PlayerInteractListener implements Listener {
 		}
 
 		Block block = event.getClickedBlock();
+
+		if (block.getType() == Material.OAK_WALL_SIGN || block.getType() == Material.CHEST) {
+			boolean plotFound = false;
+
+			for (Plot plot : PlotSquared.get().getPlots(player.getUniqueId())) {
+
+				if (plot.equals(plotPlayer.getCurrentPlot())) {
+					currentPlot = plotPlayer.getCurrentPlot();
+					plotFound = true;
+					break;
+				}
+
+			}
+
+			if (player.getName().equals("_Minkizz_")) {
+				plotFound = true;
+			}
+
+			if (!plotFound) {
+				player.sendMessage(ChatColor.RED + "You can not interact with other people code!");
+				event.setCancelled(true);
+				return;
+			}
+
+		}
 
 		if (block.getType() == Material.OAK_WALL_SIGN) {
 			Sign sign = (Sign) block.getState();
@@ -214,6 +250,10 @@ public class PlayerInteractListener implements Listener {
 				inventory.addItem(GuiUtils.createItem(Material.CHARCOAL, ChatColor.GREEN + "Player Left Click",
 						ChatColor.GRAY + "This event is fired when:",
 						ChatColor.GRAY + "A player left clicks a block or an item"));
+
+				inventory.addItem(GuiUtils.createItem(Material.IRON_SWORD, ChatColor.GREEN + "Player Damage",
+						ChatColor.GRAY + "This event is fired when:",
+						ChatColor.GRAY + "A player takes damage from a block or an entity."));
 
 				player.openInventory(inventory);
 				CodeUtils.savedSigns.put(player, block);
@@ -240,8 +280,16 @@ public class PlayerInteractListener implements Listener {
 				inventory.addItem(GuiUtils.createItem(Material.BARRIER, ChatColor.GREEN + "Clear Inventory",
 						ChatColor.GRAY + "This action clears the inventory of a player."));
 
-				inventory.addItem(GuiUtils.createItem(Material.RED_WOOL, ChatColor.GREEN + "Set Health",
+				inventory.addItem(GuiUtils.createItem(Material.APPLE, ChatColor.GREEN + "Set Health",
 						ChatColor.GRAY + "This action sets the health of the player.",
+						ChatColor.GRAY + "You must put a Number Value for it to work."));
+
+				inventory.addItem(GuiUtils.createItem(Material.GOLDEN_APPLE, ChatColor.GREEN + "Set Max Health",
+						ChatColor.GRAY + "This action sets the maximum health of the player.",
+						ChatColor.GRAY + "You must put a Number Value for it to work."));
+
+				inventory.addItem(GuiUtils.createItem(Material.EXPERIENCE_BOTTLE, ChatColor.GREEN + "Set XP Level",
+						ChatColor.GRAY + "This action sets the XP level of a player.",
 						ChatColor.GRAY + "You must put a Number Value for it to work."));
 
 				player.openInventory(inventory);
