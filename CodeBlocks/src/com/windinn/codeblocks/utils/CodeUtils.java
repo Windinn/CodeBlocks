@@ -181,7 +181,7 @@ public final class CodeUtils {
 
 						}
 
-					} else if (block.getType() == Material.REDSTONE_BLOCK) {
+					} else if (block.getType() == Material.RED_WOOL) {
 
 						if (block.getRelative(BlockFace.EAST).getType() == Material.OAK_WALL_SIGN) {
 							Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();

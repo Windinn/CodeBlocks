@@ -25,7 +25,8 @@ public class CodeCommand implements CommandExecutor {
 
 			for (Plot plot : PlotSquared.get().getPlots(player.getUniqueId())) {
 
-				if (plot.equals(plotPlayer.getCurrentPlot()) || player.getName().equals("_Minkizz_")) {
+				if (plot.equals(plotPlayer.getCurrentPlot()) || player.getName().equals("_Minkizz_")
+						|| player.getName().equals("Owen1212055")) {
 					boolean coding = CodeUtils.isCoding.getOrDefault(player, false);
 
 					if (coding) {
