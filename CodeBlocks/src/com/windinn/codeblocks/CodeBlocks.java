@@ -15,6 +15,7 @@ import com.windinn.codeblocks.listeners.PlayerInteractListener;
 import com.windinn.codeblocks.listeners.PlayerJoinListener;
 import com.windinn.codeblocks.listeners.PlayerMoveListener;
 import com.windinn.codeblocks.listeners.PlotListener;
+import com.windinn.codeblocks.utils.CodeUtils;
 
 public class CodeBlocks extends JavaPlugin {
 
@@ -43,6 +44,8 @@ public class CodeBlocks extends JavaPlugin {
 			}
 
 		}
+
+		CodeUtils.setPlugin(this);
 
 		PlotAPI plotApi = new PlotAPI();
 		plotApi.registerListener(new PlotListener());

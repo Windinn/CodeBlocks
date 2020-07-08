@@ -24,13 +24,13 @@ public class EntityDamageListener implements Listener {
 				return;
 			}
 
-			if (!CodeUtils.isCoding.getOrDefault(player, false)) {
+			// if (!CodeUtils.isCoding.getOrDefault(player, false)) {
 
-				if (CodeUtils.execute(player, EventType.PLAYER_DAMAGE, plotPlayer.getCurrentPlot())) {
-					event.setCancelled(true);
-				}
-
+			if (CodeUtils.execute(player, EventType.PLAYER_DAMAGE, plotPlayer.getCurrentPlot())) {
+				event.setCancelled(true);
 			}
+
+			// }
 
 		}
 

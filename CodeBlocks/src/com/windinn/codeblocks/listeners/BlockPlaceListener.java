@@ -13,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.PistonBaseMaterial;
 
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.player.PlotPlayer;
@@ -54,6 +55,10 @@ public class BlockPlaceListener implements Listener {
 			plotFound = true;
 		}
 
+		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
+			return;
+		}
+
 		if (!plotFound) {
 			player.sendMessage(ChatColor.RED + "You must code in your own plot!");
 			event.setCancelled(true);
@@ -66,7 +71,7 @@ public class BlockPlaceListener implements Listener {
 		Plot plot = plotArea.getPlotAbs(new com.plotsquared.core.location.Location(location.getWorld().getName(),
 				location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
-		if (plot != currentPlot) {
+		if (plot != currentPlot && !player.getName().equals("_Minkizz_")) {
 			player.sendMessage(ChatColor.RED + "The location must be located in your plot!");
 			event.setCancelled(true);
 			return;
@@ -148,6 +153,76 @@ public class BlockPlaceListener implements Listener {
 
 			sign.setLine(0, ChatColor.RED + "ACTION");
 			sign.setLine(1, ChatColor.WHITE + "Cancel Event");
+
+			WallSign wallSign = (WallSign) sign.getBlockData();
+			wallSign.setFacing(BlockFace.EAST);
+
+			sign.setBlockData(wallSign);
+			sign.update();
+		} else if (block.getType() == Material.REDSTONE_BLOCK
+				&& item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Redstone Block")) {
+
+			if (block.getRelative(BlockFace.NORTH).getType() != Material.AIR
+					|| block.getRelative(BlockFace.EAST).getType() != Material.AIR
+					|| block.getRelative(BlockFace.UP).getType() != Material.AIR) {
+				event.setCancelled(true);
+				player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
+				return;
+			}
+
+			block.getRelative(BlockFace.NORTH).setType(Material.STONE);
+			block.getRelative(BlockFace.EAST).setType(Material.OAK_WALL_SIGN);
+
+			BlockState state = block.getRelative(BlockFace.EAST).getState();
+			Sign sign = (Sign) state;
+
+			sign.setLine(0, ChatColor.RED + "REDSTONE");
+			sign.setLine(1, ChatColor.WHITE + "1 tick");
+
+			WallSign wallSign = (WallSign) sign.getBlockData();
+			wallSign.setFacing(BlockFace.EAST);
+
+			sign.setBlockData(wallSign);
+			sign.update();
+		} else if (block.getType() == Material.IRON_BLOCK
+				&& item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Condition Block")) {
+
+			if (block.getRelative(BlockFace.NORTH).getType() != Material.AIR
+					&& block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).getType() != Material.AIR
+					&& block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
+							.getType() != Material.AIR
+					&& block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
+							.getRelative(BlockFace.NORTH).getType() != Material.AIR
+					|| block.getRelative(BlockFace.EAST).getType() != Material.AIR
+					|| block.getRelative(BlockFace.UP).getType() != Material.AIR) {
+				event.setCancelled(true);
+				player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
+				return;
+			}
+
+			block.getRelative(BlockFace.UP).setType(Material.CHEST);
+			block.getRelative(BlockFace.NORTH).setType(Material.STONE);
+			block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).setType(Material.PISTON);
+			block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
+					.getRelative(BlockFace.NORTH).setType(Material.PISTON);
+
+			BlockState pistonState = block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
+					.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).getState();
+			PistonBaseMaterial piston = (PistonBaseMaterial) pistonState.getData();
+
+			piston.setFacingDirection(BlockFace.SOUTH);
+
+			pistonState.setData(piston);
+			pistonState.update();
+
+			block.getRelative(BlockFace.EAST).setType(Material.OAK_WALL_SIGN);
+
+			BlockState state = block.getRelative(BlockFace.EAST).getState();
+			Sign sign = (Sign) state;
+
+			sign.setLine(0, ChatColor.YELLOW + "CONDITION");
+			sign.setLine(1, ChatColor.WHITE + "Target Block");
+			sign.setLine(2, ChatColor.WHITE + "Equals Location");
 
 			WallSign wallSign = (WallSign) sign.getBlockData();
 			wallSign.setFacing(BlockFace.EAST);

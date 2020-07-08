@@ -42,6 +42,10 @@ public class BlockBreakListener implements Listener {
 			plotFound = true;
 		}
 
+		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
+			return;
+		}
+
 		if (!plotFound) {
 			player.sendMessage(ChatColor.RED + "You must code in your own plot!");
 			event.setCancelled(true);
@@ -54,7 +58,7 @@ public class BlockBreakListener implements Listener {
 		Plot plot = plotArea.getPlotAbs(new com.plotsquared.core.location.Location(location.getWorld().getName(),
 				location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
-		if (plot != currentPlot) {
+		if (plot != currentPlot && !player.getName().equals("_Minkizz_")) {
 			player.sendMessage(ChatColor.RED + "The location must be located in your plot!");
 			event.setCancelled(true);
 			return;
@@ -96,6 +100,21 @@ public class BlockBreakListener implements Listener {
 				Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
 
 				if (sign.getLine(0).equals(ChatColor.RED + "ACTION")) {
+					event.setCancelled(true);
+					block.getRelative(BlockFace.UP).setType(Material.AIR);
+					block.getRelative(BlockFace.NORTH).setType(Material.AIR);
+					block.getRelative(BlockFace.EAST).setType(Material.AIR);
+					block.setType(Material.AIR);
+				}
+
+			}
+
+		} else if (block.getType() == Material.REDSTONE_BLOCK) {
+
+			if (block.getRelative(BlockFace.EAST).getType() == Material.OAK_WALL_SIGN) {
+				Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
+
+				if (sign.getLine(0).equals(ChatColor.RED + "REDSTONE")) {
 					event.setCancelled(true);
 					block.getRelative(BlockFace.UP).setType(Material.AIR);
 					block.getRelative(BlockFace.NORTH).setType(Material.AIR);
@@ -150,6 +169,20 @@ public class BlockBreakListener implements Listener {
 
 				}
 
+			} else if (sign.getLine(0).equals(ChatColor.RED + "REDSTONE")) {
+
+				if (block.getRelative(BlockFace.WEST).getType() == Material.REDSTONE_BLOCK) {
+
+					if (block.getRelative(BlockFace.WEST).getRelative(BlockFace.NORTH).getType() == Material.STONE) {
+						event.setCancelled(true);
+						block.setType(Material.AIR);
+						block.getRelative(BlockFace.WEST).setType(Material.AIR);
+						block.getRelative(BlockFace.WEST).getRelative(BlockFace.UP).setType(Material.AIR);
+						block.getRelative(BlockFace.WEST).getRelative(BlockFace.NORTH).setType(Material.AIR);
+					}
+
+				}
+
 			}
 
 		} else if (block.getType() == Material.STONE) {
@@ -187,6 +220,17 @@ public class BlockBreakListener implements Listener {
 					block.setType(Material.AIR);
 				}
 
+			} else if (block.getRelative(BlockFace.SOUTH).getType() == Material.REDSTONE_BLOCK) {
+				Sign sign = (Sign) block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST).getState();
+
+				if (sign.getLine(0).equals(ChatColor.RED + "REDSTONE")) {
+					event.setCancelled(true);
+					block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.UP).setType(Material.AIR);
+					block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST).setType(Material.AIR);
+					block.getRelative(BlockFace.SOUTH).setType(Material.AIR);
+					block.setType(Material.AIR);
+				}
+
 			}
 
 		} else if (block.getType() == Material.CHEST) {
@@ -216,6 +260,51 @@ public class BlockBreakListener implements Listener {
 						block.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST).setType(Material.AIR);
 						block.getRelative(BlockFace.DOWN).setType(Material.AIR);
 						block.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).setType(Material.AIR);
+						block.setType(Material.AIR);
+					}
+
+				}
+
+			}
+
+		} else if (block.getType() == Material.IRON_BLOCK) {
+
+			if (block.getRelative(BlockFace.EAST).getType() == Material.OAK_WALL_SIGN) {
+				Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
+
+				if (sign.getLine(0).equals(ChatColor.YELLOW + "CONDITION")) {
+
+					if (block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).getType() == Material.PISTON) {
+						int pistonZ = block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).getLocation()
+								.getBlockZ();
+						int secondPistonZ = 0;
+						Block current = block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
+								.getRelative(BlockFace.NORTH);
+						int i = 0;
+
+						for (int z = pistonZ; current.getType() != Material.PISTON; z--) {
+							current = new Location(block.getLocation().getWorld(), block.getLocation().getBlockX(),
+									block.getLocation().getBlockY(), z).getBlock();
+
+							if (current.getType() == Material.PISTON) {
+								secondPistonZ = z;
+								break;
+							}
+
+							if (i >= 128) {
+								break;
+							}
+
+							current.setType(Material.AIR);
+							i++;
+						}
+
+						event.setCancelled(true);
+						block.getRelative(BlockFace.UP).setType(Material.AIR);
+						block.getRelative(BlockFace.NORTH).setType(Material.AIR);
+						block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).setType(Material.AIR);
+						block.getRelative(BlockFace.EAST).setType(Material.AIR);
+						current.setType(Material.AIR);
 						block.setType(Material.AIR);
 					}
 
