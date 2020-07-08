@@ -172,19 +172,22 @@ public class PlayerInteractListener implements Listener {
 
 				if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
-					if (CodeUtils.execute(player, EventType.PLAYER_RIGHT_CLICK, plotPlayer.getCurrentPlot())) {
+					if (CodeUtils.execute(player, EventType.PLAYER_RIGHT_CLICK, plotPlayer.getCurrentPlot(),
+							event.getClickedBlock())) {
 						event.setCancelled(true);
 					}
 
 				} else if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
 
-					if (CodeUtils.execute(player, EventType.PLAYER_LEFT_CLICK, plotPlayer.getCurrentPlot())) {
+					if (CodeUtils.execute(player, EventType.PLAYER_LEFT_CLICK, plotPlayer.getCurrentPlot(),
+							event.getClickedBlock())) {
 						event.setCancelled(true);
 					}
 
 				}
 
-				if (CodeUtils.execute(player, EventType.PLAYER_INTERACT, plotPlayer.getCurrentPlot())) {
+				if (CodeUtils.execute(player, EventType.PLAYER_INTERACT, plotPlayer.getCurrentPlot(),
+						event.getClickedBlock())) {
 					event.setCancelled(true);
 				}
 
@@ -259,7 +262,7 @@ public class PlayerInteractListener implements Listener {
 				player.openInventory(inventory);
 				CodeUtils.savedSigns.put(player, block);
 			} else if (sign.getLine(0).equals(ChatColor.GOLD + "ACTION")) {
-				Inventory inventory = Bukkit.createInventory(null, 9, "Modify Action Block");
+				Inventory inventory = Bukkit.createInventory(null, 18, "Modify Action Block");
 
 				inventory.addItem(GuiUtils.createItem(Material.PAPER, ChatColor.GREEN + "Set Gamemode to Survival",
 						ChatColor.GRAY + "This action sets the gamemode of the player to survival."));
@@ -292,6 +295,10 @@ public class PlayerInteractListener implements Listener {
 				inventory.addItem(GuiUtils.createItem(Material.EXPERIENCE_BOTTLE, ChatColor.GREEN + "Set XP Level",
 						ChatColor.GRAY + "This action sets the XP level of a player.",
 						ChatColor.GRAY + "You must put a Number Value for it to work."));
+
+				inventory.addItem(GuiUtils.createItem(Material.MUSIC_DISC_CAT, ChatColor.GREEN + "Play Music Disk",
+						ChatColor.GRAY + "This action plays a music disk to the player.",
+						ChatColor.GRAY + "You must put a Music Disk for it to work."));
 
 				player.openInventory(inventory);
 				CodeUtils.savedSigns.put(player, block);

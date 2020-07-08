@@ -101,6 +101,13 @@ public class InventoryClickListener implements Listener {
 				sign.setLine(2, null);
 
 				sign.update();
+			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Play Music Disk")) {
+				Sign sign = (Sign) signBlock.getState();
+
+				sign.setLine(1, ChatColor.WHITE + "Play Music Disk");
+				sign.setLine(2, null);
+
+				sign.update();
 			}
 
 			player.closeInventory();

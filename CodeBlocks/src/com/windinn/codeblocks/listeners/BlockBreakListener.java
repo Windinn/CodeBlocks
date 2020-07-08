@@ -109,7 +109,7 @@ public class BlockBreakListener implements Listener {
 
 			}
 
-		} else if (block.getType() == Material.REDSTONE_BLOCK) {
+		} else if (block.getType() == Material.RED_WOOL) {
 
 			if (block.getRelative(BlockFace.EAST).getType() == Material.OAK_WALL_SIGN) {
 				Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
@@ -171,7 +171,7 @@ public class BlockBreakListener implements Listener {
 
 			} else if (sign.getLine(0).equals(ChatColor.RED + "REDSTONE")) {
 
-				if (block.getRelative(BlockFace.WEST).getType() == Material.REDSTONE_BLOCK) {
+				if (block.getRelative(BlockFace.WEST).getType() == Material.RED_WOOL) {
 
 					if (block.getRelative(BlockFace.WEST).getRelative(BlockFace.NORTH).getType() == Material.STONE) {
 						event.setCancelled(true);
@@ -181,6 +181,49 @@ public class BlockBreakListener implements Listener {
 						block.getRelative(BlockFace.WEST).getRelative(BlockFace.NORTH).setType(Material.AIR);
 					}
 
+				}
+
+			} else if (sign.getLine(0).equals(ChatColor.YELLOW + "CONDITION")) {
+
+				if (block.getRelative(BlockFace.WEST).getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
+						.getType() == Material.PISTON) {
+					int pistonZ = block.getRelative(BlockFace.WEST).getRelative(BlockFace.NORTH)
+							.getRelative(BlockFace.NORTH).getLocation().getBlockZ();
+					Block current = block.getRelative(BlockFace.WEST).getRelative(BlockFace.NORTH)
+							.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH);
+					int i = 0;
+					int z = pistonZ - 1;
+
+					while (true) {
+						current = new Location(block.getLocation().getWorld(),
+								block.getRelative(BlockFace.WEST).getLocation().getBlockX(),
+								block.getLocation().getBlockY(), z).getBlock();
+
+						if (current.getType() == Material.PISTON) {
+							break;
+						}
+
+						if (i >= 128) {
+							break;
+						}
+
+						current.getRelative(BlockFace.EAST).setType(Material.AIR);
+						current.getRelative(BlockFace.UP).setType(Material.AIR);
+						current.setType(Material.AIR);
+						i++;
+						z--;
+					}
+
+					event.setCancelled(true);
+					block.getRelative(BlockFace.WEST).getRelative(BlockFace.UP).setType(Material.AIR);
+					block.getRelative(BlockFace.WEST).getRelative(BlockFace.NORTH).setType(Material.AIR);
+					block.getRelative(BlockFace.WEST).getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
+							.setType(Material.AIR);
+					block.setType(Material.AIR);
+					current.getRelative(BlockFace.EAST).setType(Material.AIR);
+					current.getRelative(BlockFace.UP).setType(Material.AIR);
+					current.setType(Material.AIR);
+					block.getRelative(BlockFace.WEST).setType(Material.AIR);
 				}
 
 			}
@@ -220,7 +263,7 @@ public class BlockBreakListener implements Listener {
 					block.setType(Material.AIR);
 				}
 
-			} else if (block.getRelative(BlockFace.SOUTH).getType() == Material.REDSTONE_BLOCK) {
+			} else if (block.getRelative(BlockFace.SOUTH).getType() == Material.RED_WOOL) {
 				Sign sign = (Sign) block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST).getState();
 
 				if (sign.getLine(0).equals(ChatColor.RED + "REDSTONE")) {
@@ -229,6 +272,54 @@ public class BlockBreakListener implements Listener {
 					block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST).setType(Material.AIR);
 					block.getRelative(BlockFace.SOUTH).setType(Material.AIR);
 					block.setType(Material.AIR);
+				}
+
+			} else if (block.getRelative(BlockFace.SOUTH).getType() == Material.OAK_PLANKS) {
+
+				if (block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST)
+						.getType() == Material.OAK_WALL_SIGN) {
+					Sign sign = (Sign) block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST).getState();
+
+					if (sign.getLine(0).equals(ChatColor.YELLOW + "CONDITION")) {
+
+						if (block.getRelative(BlockFace.NORTH).getType() == Material.PISTON) {
+							int pistonZ = block.getRelative(BlockFace.NORTH).getLocation().getBlockZ();
+							Block current = block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH);
+							int i = 0;
+							int z = pistonZ - 1;
+
+							while (true) {
+								current = new Location(block.getLocation().getWorld(), block.getLocation().getBlockX(),
+										block.getLocation().getBlockY(), z).getBlock();
+
+								if (current.getType() == Material.PISTON) {
+									break;
+								}
+
+								if (i >= 128) {
+									break;
+								}
+
+								current.getRelative(BlockFace.EAST).setType(Material.AIR);
+								current.getRelative(BlockFace.UP).setType(Material.AIR);
+								current.setType(Material.AIR);
+								i++;
+								z--;
+							}
+
+							event.setCancelled(true);
+							block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST).setType(Material.AIR);
+							block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.UP).setType(Material.AIR);
+							block.getRelative(BlockFace.SOUTH).setType(Material.AIR);
+							block.getRelative(BlockFace.NORTH).setType(Material.AIR);
+							current.getRelative(BlockFace.EAST).setType(Material.AIR);
+							current.getRelative(BlockFace.UP).setType(Material.AIR);
+							current.setType(Material.AIR);
+							block.setType(Material.AIR);
+						}
+
+					}
+
 				}
 
 			}
@@ -265,9 +356,61 @@ public class BlockBreakListener implements Listener {
 
 				}
 
+			} else if (block.getRelative(BlockFace.DOWN).getType() == Material.OAK_PLANKS) {
+
+				if (block.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST).getType() == Material.OAK_WALL_SIGN) {
+					Sign sign = (Sign) block.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST).getState();
+
+					if (sign.getLine(0).equals(ChatColor.YELLOW + "CONDITION")) {
+
+						if (block.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
+								.getType() == Material.PISTON) {
+							int pistonZ = block.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH)
+									.getRelative(BlockFace.NORTH).getLocation().getBlockZ();
+							Block current = block.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH)
+									.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH);
+							int i = 0;
+							int z = pistonZ - 1;
+
+							while (true) {
+								current = new Location(block.getLocation().getWorld(),
+										block.getRelative(BlockFace.DOWN).getLocation().getBlockX(),
+										block.getRelative(BlockFace.DOWN).getLocation().getY(), z).getBlock();
+
+								if (current.getType() == Material.PISTON) {
+									break;
+								}
+
+								if (i >= 128) {
+									break;
+								}
+
+								current.getRelative(BlockFace.EAST).setType(Material.AIR);
+								current.getRelative(BlockFace.UP).setType(Material.AIR);
+								current.setType(Material.AIR);
+								i++;
+								z--;
+							}
+
+							event.setCancelled(true);
+							block.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).setType(Material.AIR);
+							block.getRelative(BlockFace.DOWN).getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
+									.setType(Material.AIR);
+							block.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST).setType(Material.AIR);
+							block.getRelative(BlockFace.DOWN).setType(Material.AIR);
+							current.getRelative(BlockFace.EAST).setType(Material.AIR);
+							current.getRelative(BlockFace.UP).setType(Material.AIR);
+							current.setType(Material.AIR);
+							block.setType(Material.AIR);
+						}
+
+					}
+
+				}
+
 			}
 
-		} else if (block.getType() == Material.IRON_BLOCK) {
+		} else if (block.getType() == Material.OAK_PLANKS) {
 
 			if (block.getRelative(BlockFace.EAST).getType() == Material.OAK_WALL_SIGN) {
 				Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
@@ -277,17 +420,16 @@ public class BlockBreakListener implements Listener {
 					if (block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).getType() == Material.PISTON) {
 						int pistonZ = block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).getLocation()
 								.getBlockZ();
-						int secondPistonZ = 0;
 						Block current = block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
 								.getRelative(BlockFace.NORTH);
 						int i = 0;
+						int z = pistonZ - 1;
 
-						for (int z = pistonZ; current.getType() != Material.PISTON; z--) {
+						while (true) {
 							current = new Location(block.getLocation().getWorld(), block.getLocation().getBlockX(),
 									block.getLocation().getBlockY(), z).getBlock();
 
 							if (current.getType() == Material.PISTON) {
-								secondPistonZ = z;
 								break;
 							}
 
@@ -295,8 +437,11 @@ public class BlockBreakListener implements Listener {
 								break;
 							}
 
+							current.getRelative(BlockFace.EAST).setType(Material.AIR);
+							current.getRelative(BlockFace.UP).setType(Material.AIR);
 							current.setType(Material.AIR);
 							i++;
+							z--;
 						}
 
 						event.setCancelled(true);
@@ -304,6 +449,8 @@ public class BlockBreakListener implements Listener {
 						block.getRelative(BlockFace.NORTH).setType(Material.AIR);
 						block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).setType(Material.AIR);
 						block.getRelative(BlockFace.EAST).setType(Material.AIR);
+						current.getRelative(BlockFace.EAST).setType(Material.AIR);
+						current.getRelative(BlockFace.UP).setType(Material.AIR);
 						current.setType(Material.AIR);
 						block.setType(Material.AIR);
 					}
@@ -312,6 +459,10 @@ public class BlockBreakListener implements Listener {
 
 			}
 
+		} else {
+			player.sendMessage(
+					ChatColor.RED + "You can not destroy other blocks than code blocks in development mode!");
+			event.setCancelled(true);
 		}
 
 	}

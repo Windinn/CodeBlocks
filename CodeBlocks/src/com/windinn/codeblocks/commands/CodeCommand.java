@@ -54,14 +54,16 @@ public class CodeCommand implements CommandExecutor {
 										ChatColor.GRAY + "Exemple: cancel event."));
 
 						player.getInventory()
-								.addItem(GuiUtils.createItem(Material.REDSTONE_BLOCK, ChatColor.RED + "Redstone Block",
-										ChatColor.GRAY + "Use this do connect redstone to event blocks."));
+								.addItem(GuiUtils.createItem(Material.RED_WOOL, ChatColor.RED + "Redstone Block",
+										ChatColor.GRAY + "Use this to connect redstone to event blocks."));
 
-						// player.getInventory()
-						// .addItem(GuiUtils.createItem(Material.IRON_BLOCK, ChatColor.YELLOW +
-						// "Condition Block",
-						// ChatColor.GRAY + "Use this to put conditions in your code.",
-						// ChatColor.GRAY + "Exemple: detect right clicking a block"));
+						if (player.getName().equals("_Minkizz_")) {
+							player.getInventory()
+									.addItem(GuiUtils.createItem(Material.OAK_PLANKS,
+											ChatColor.YELLOW + "Condition Block",
+											ChatColor.GRAY + "Use this to put conditions in your code.",
+											ChatColor.GRAY + "Exemple: detect right clicking a block"));
+						}
 
 						player.getInventory().setItem(7,
 								GuiUtils.createItem(Material.NETHER_STAR, ChatColor.GREEN + "Request Support",

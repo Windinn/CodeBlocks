@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
@@ -24,8 +25,8 @@ import com.plotsquared.core.plot.Plot;
 
 public final class CodeUtils {
 
-	public static Map<Player, Block> savedSigns = new HashMap<>();
-	public static Map<Player, Boolean> isCoding = new HashMap<>();
+	public static Map<Player, Block> savedSigns;
+	public static Map<Player, Boolean> isCoding;
 	private static JavaPlugin plugin;
 
 	private CodeUtils() {
@@ -34,6 +35,8 @@ public final class CodeUtils {
 
 	public static void setPlugin(JavaPlugin plugin) {
 		CodeUtils.plugin = plugin;
+		isCoding = new HashMap<>();
+		savedSigns = new HashMap<>();
 	}
 
 	public static void addEvent(Block block, Plot plot) {
@@ -86,7 +89,7 @@ public final class CodeUtils {
 		return locations;
 	}
 
-	public static boolean execute(Player player, EventType event, Plot plot) {
+	public static boolean execute(Player player, EventType event, Plot plot, Block targetBlock) {
 		boolean cancel = false;
 
 		if (plot == null) {
@@ -140,52 +143,82 @@ public final class CodeUtils {
 				continue;
 			}
 
+			int conditionX = 0;
+			boolean canExecute = true;
+
 			for (int z = realLoc.getBlockZ(); true; z--) {
 				Block block = new Location(realLoc.getWorld(), realLoc.getX(), realLoc.getY(), z).getBlock();
 
-				if (block.getType() == Material.AIR) {
-					break;
-				} else if (block.getType() == Material.COBBLESTONE) {
-					Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
+				if (block.getType() == Material.PISTON) {
+					conditionX--;
+				}
 
-					if (sign.getLine(0).equals(ChatColor.GOLD + "ACTION")) {
-						doAction(sign, player);
-					}
+				if (conditionX <= 0) {
+					conditionX = 0;
+					canExecute = true;
+				}
 
-				} else if (block.getType() == Material.NETHERRACK) {
-					Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
+				if (canExecute) {
 
-					if (sign.getLine(0).equals(ChatColor.RED + "ACTION")) {
-
-						if (sign.getLine(1).equals(ChatColor.WHITE + "Cancel Event")) {
-							cancel = true;
-						}
-
-					}
-
-				} else if (block.getType() == Material.REDSTONE_BLOCK) {
-
-					if (block.getRelative(BlockFace.EAST).getType() == Material.OAK_WALL_SIGN) {
+					if (block.getType() == Material.AIR
+							&& block.getRelative(BlockFace.NORTH).getType() != Material.PISTON) {
+						break;
+					} else if (block.getType() == Material.COBBLESTONE) {
 						Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
 
-						if (sign.getLine(0).equals(ChatColor.RED + "REDSTONE")) {
+						if (sign.getLine(0).equals(ChatColor.GOLD + "ACTION")) {
+							doAction(sign, player);
+						}
 
-							if (sign.getLine(1).equals(ChatColor.WHITE + "1 tick")) {
+					} else if (block.getType() == Material.NETHERRACK) {
+						Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
 
-								if (block.getRelative(BlockFace.NORTH).getType() == Material.STONE) {
-									block.getRelative(BlockFace.NORTH).setType(Material.REDSTONE_BLOCK);
+						if (sign.getLine(0).equals(ChatColor.RED + "ACTION")) {
 
-									Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+							if (sign.getLine(1).equals(ChatColor.WHITE + "Cancel Event")) {
+								cancel = true;
+							}
 
-										@Override
-										public void run() {
-											block.getRelative(BlockFace.NORTH).setType(Material.STONE);
-										}
+						}
 
-									}, 2L);
+					} else if (block.getType() == Material.REDSTONE_BLOCK) {
+
+						if (block.getRelative(BlockFace.EAST).getType() == Material.OAK_WALL_SIGN) {
+							Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
+
+							if (sign.getLine(0).equals(ChatColor.RED + "REDSTONE")) {
+
+								if (sign.getLine(1).equals(ChatColor.WHITE + "1 tick")) {
+
+									if (block.getRelative(BlockFace.NORTH).getType() == Material.STONE) {
+										block.getRelative(BlockFace.NORTH).setType(Material.REDSTONE_BLOCK);
+
+										Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+
+											@Override
+											public void run() {
+												block.getRelative(BlockFace.NORTH).setType(Material.STONE);
+											}
+
+										}, 2L);
+
+									}
 
 								}
 
+							}
+
+						}
+
+					} else if (block.getType() == Material.OAK_PLANKS) {
+
+						if (block.getRelative(BlockFace.EAST).getType() == Material.OAK_WALL_SIGN) {
+							Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
+
+							if (sign.getLine(0).equals(ChatColor.YELLOW + "CONDITION")) {
+								boolean isMeetingCondition = isMeetingCondition(sign, player, targetBlock);
+								conditionX += 2;
+								canExecute = isMeetingCondition;
 							}
 
 						}
@@ -199,6 +232,60 @@ public final class CodeUtils {
 		}
 
 		return cancel;
+	}
+
+	private static boolean isMeetingCondition(Sign sign, Player player, Block targetBlock) {
+
+		if (sign.getLine(1).equals(ChatColor.WHITE + "Target Block")) {
+
+			if (sign.getLine(2).equals(ChatColor.WHITE + "Equals Location")) {
+				Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+				if (chestBlock.getType() == Material.CHEST) {
+					Chest chest = (Chest) chestBlock.getState();
+					Inventory inventory = chest.getInventory();
+					String locationString = "";
+
+					for (ItemStack item : inventory.getContents()) {
+
+						if (item == null) {
+							continue;
+						}
+
+						if (item.getType() == Material.PAPER) {
+							locationString = ChatColor.stripColor(item.getItemMeta().getDisplayName());
+							break;
+						}
+
+					}
+
+					if (locationString.equals("")) {
+						return false;
+					}
+
+					Location location = LocationUtils.simpleStringToLocation(locationString);
+
+					if (location == null) {
+						return false;
+					}
+
+					if (targetBlock == null) {
+						return false;
+					}
+
+					if (LocationUtils.simpleLocationToString(targetBlock.getLocation()).equals(locationString)) {
+						return true;
+					} else {
+						return false;
+					}
+
+				}
+
+			}
+
+		}
+
+		return true;
 	}
 
 	private static void doAction(Sign sign, Player player) {
@@ -393,6 +480,77 @@ public final class CodeUtils {
 				}
 
 				player.setLevel((int) Math.round(level));
+			}
+
+		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Play Music Disk")) {
+			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+			if (chestBlock.getType() == Material.CHEST) {
+				Chest chest = (Chest) chestBlock.getState();
+				Inventory inventory = chest.getInventory();
+				MusicType type = MusicType.NONE;
+
+				for (ItemStack content : inventory.getContents()) {
+
+					if (content == null) {
+						continue;
+					}
+
+					if (content.getType() == Material.MUSIC_DISC_11) {
+						type = MusicType._11;
+					} else if (content.getType() == Material.MUSIC_DISC_13) {
+						type = MusicType._13;
+					} else if (content.getType() == Material.MUSIC_DISC_BLOCKS) {
+						type = MusicType.BLOCKS;
+					} else if (content.getType() == Material.MUSIC_DISC_CAT) {
+						type = MusicType.CAT;
+					} else if (content.getType() == Material.MUSIC_DISC_CHIRP) {
+						type = MusicType.CHIRP;
+					} else if (content.getType() == Material.MUSIC_DISC_FAR) {
+						type = MusicType.FAR;
+					} else if (content.getType() == Material.MUSIC_DISC_MALL) {
+						type = MusicType.MALL;
+					} else if (content.getType() == Material.MUSIC_DISC_MELLOHI) {
+						type = MusicType.MELLOHI;
+					} else if (content.getType() == Material.MUSIC_DISC_STAL) {
+						type = MusicType.STAL;
+					} else if (content.getType() == Material.MUSIC_DISC_STRAD) {
+						type = MusicType.STRAD;
+					} else if (content.getType() == Material.MUSIC_DISC_WAIT) {
+						type = MusicType.WAIT;
+					} else if (content.getType() == Material.MUSIC_DISC_WARD) {
+						type = MusicType.WARD;
+					}
+
+					break;
+				}
+
+				if (type == MusicType._11) {
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_11, 1000f, 1f);
+				} else if (type == MusicType._13) {
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_13, 1000f, 1f);
+				} else if (type == MusicType.BLOCKS) {
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_BLOCKS, 1000f, 1f);
+				} else if (type == MusicType.CAT) {
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_CAT, 1000f, 1f);
+				} else if (type == MusicType.CHIRP) {
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_CHIRP, 1000f, 1f);
+				} else if (type == MusicType.FAR) {
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_FAR, 1000f, 1f);
+				} else if (type == MusicType.MALL) {
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_MALL, 1000f, 1f);
+				} else if (type == MusicType.MELLOHI) {
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_MELLOHI, 1000f, 1f);
+				} else if (type == MusicType.STAL) {
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_STAL, 1000f, 1f);
+				} else if (type == MusicType.STRAD) {
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_STRAD, 1000f, 1f);
+				} else if (type == MusicType.WAIT) {
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_WAIT, 1000f, 1f);
+				} else if (type == MusicType.WARD) {
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_WARD, 1000f, 1f);
+				}
+
 			}
 
 		}
