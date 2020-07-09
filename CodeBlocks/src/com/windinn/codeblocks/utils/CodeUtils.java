@@ -137,6 +137,9 @@ public final class CodeUtils {
 			} else if (event == EventType.PLAYER_DAMAGE
 					&& eventSign.getLine(1).equals(ChatColor.WHITE + "Player Damage")) {
 				pass = true;
+			} else if (event == EventType.PLAYER_BLOCK_BREAK
+					&& eventSign.getLine(1).equals(ChatColor.WHITE + "Break Block")) {
+				pass = true;
 			}
 
 			if (!pass) {
@@ -164,19 +167,27 @@ public final class CodeUtils {
 							&& block.getRelative(BlockFace.NORTH).getType() != Material.PISTON) {
 						break;
 					} else if (block.getType() == Material.COBBLESTONE) {
-						Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
 
-						if (sign.getLine(0).equals(ChatColor.GOLD + "ACTION")) {
-							doAction(sign, player);
+						if (block.getRelative(BlockFace.EAST).getType() == Material.OAK_WALL_SIGN) {
+							Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
+
+							if (sign.getLine(0).equals(ChatColor.GOLD + "ACTION")) {
+								doAction(sign, player);
+							}
+
 						}
 
 					} else if (block.getType() == Material.NETHERRACK) {
-						Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
 
-						if (sign.getLine(0).equals(ChatColor.RED + "ACTION")) {
+						if (block.getRelative(BlockFace.EAST).getType() == Material.OAK_WALL_SIGN) {
+							Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
 
-							if (sign.getLine(1).equals(ChatColor.WHITE + "Cancel Event")) {
-								cancel = true;
+							if (sign.getLine(0).equals(ChatColor.RED + "ACTION")) {
+
+								if (sign.getLine(1).equals(ChatColor.WHITE + "Cancel Event")) {
+									cancel = true;
+								}
+
 							}
 
 						}
@@ -235,45 +246,72 @@ public final class CodeUtils {
 	}
 
 	private static boolean isMeetingCondition(Sign sign, Player player, Block targetBlock) {
+		boolean inversed = sign.getLine(3).equals(ChatColor.RED + "NOT");
 
-		if (sign.getLine(1).equals(ChatColor.WHITE + "Target Block")) {
+		if (sign.getLine(1).equals(ChatColor.WHITE + "Is Looking At")) {
+			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
 
-			if (sign.getLine(2).equals(ChatColor.WHITE + "Equals Location")) {
-				Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+			if (chestBlock.getType() == Material.CHEST) {
+				Chest chest = (Chest) chestBlock.getState();
+				Inventory inventory = chest.getInventory();
+				String locationString = "";
 
-				if (chestBlock.getType() == Material.CHEST) {
-					Chest chest = (Chest) chestBlock.getState();
-					Inventory inventory = chest.getInventory();
-					String locationString = "";
+				for (ItemStack item : inventory.getContents()) {
 
-					for (ItemStack item : inventory.getContents()) {
-
-						if (item == null) {
-							continue;
-						}
-
-						if (item.getType() == Material.PAPER) {
-							locationString = ChatColor.stripColor(item.getItemMeta().getDisplayName());
-							break;
-						}
-
+					if (item == null) {
+						continue;
 					}
 
-					if (locationString.equals("")) {
+					if (item.getType() == Material.PAPER) {
+						locationString = ChatColor.stripColor(item.getItemMeta().getDisplayName());
+						break;
+					}
+
+				}
+
+				if (locationString.equals("")) {
+
+					if (inversed) {
+						return true;
+					} else {
 						return false;
 					}
 
-					Location location = LocationUtils.simpleStringToLocation(locationString);
+				}
 
-					if (location == null) {
+				Location location = LocationUtils.simpleStringToLocation(locationString);
+
+				if (location == null) {
+
+					if (inversed) {
+						return true;
+					} else {
 						return false;
 					}
 
-					if (targetBlock == null) {
+				}
+
+				if (targetBlock == null) {
+
+					if (inversed) {
+						return true;
+					} else {
 						return false;
 					}
 
-					if (LocationUtils.simpleLocationToString(targetBlock.getLocation()).equals(locationString)) {
+				}
+
+				if (LocationUtils.simpleLocationToString(targetBlock.getLocation()).equals(locationString)) {
+
+					if (inversed) {
+						return false;
+					} else {
+						return true;
+					}
+
+				} else {
+
+					if (inversed) {
 						return true;
 					} else {
 						return false;
@@ -482,6 +520,42 @@ public final class CodeUtils {
 				player.setLevel((int) Math.round(level));
 			}
 
+		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Add XP Level")) {
+			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+			if (chestBlock.getType() == Material.CHEST) {
+				Chest chest = (Chest) chestBlock.getState();
+				Inventory inventory = chest.getInventory();
+				ItemStack item = null;
+				double level = 0d;
+
+				for (ItemStack content : inventory.getContents()) {
+
+					if (content == null) {
+						continue;
+					}
+
+					if (content.getType() != Material.SLIME_BALL) {
+						continue;
+					}
+
+					item = content;
+					break;
+				}
+
+				if (item == null) {
+					return;
+				}
+
+				try {
+					level = Double.parseDouble(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
+				} catch (NumberFormatException exception) {
+					return;
+				}
+
+				player.setLevel(player.getLevel() + ((int) Math.round(level)));
+			}
+
 		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Play Music Disk")) {
 			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
 
@@ -526,29 +600,64 @@ public final class CodeUtils {
 				}
 
 				if (type == MusicType._11) {
-					player.playSound(player.getLocation(), Sound.MUSIC_DISC_11, 1000f, 1f);
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_11, 10000f, 1f);
 				} else if (type == MusicType._13) {
-					player.playSound(player.getLocation(), Sound.MUSIC_DISC_13, 1000f, 1f);
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_13, 10000f, 1f);
 				} else if (type == MusicType.BLOCKS) {
-					player.playSound(player.getLocation(), Sound.MUSIC_DISC_BLOCKS, 1000f, 1f);
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_BLOCKS, 10000f, 1f);
 				} else if (type == MusicType.CAT) {
-					player.playSound(player.getLocation(), Sound.MUSIC_DISC_CAT, 1000f, 1f);
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_CAT, 10000f, 1f);
 				} else if (type == MusicType.CHIRP) {
-					player.playSound(player.getLocation(), Sound.MUSIC_DISC_CHIRP, 1000f, 1f);
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_CHIRP, 10000f, 1f);
 				} else if (type == MusicType.FAR) {
-					player.playSound(player.getLocation(), Sound.MUSIC_DISC_FAR, 1000f, 1f);
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_FAR, 10000f, 1f);
 				} else if (type == MusicType.MALL) {
-					player.playSound(player.getLocation(), Sound.MUSIC_DISC_MALL, 1000f, 1f);
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_MALL, 10000f, 1f);
 				} else if (type == MusicType.MELLOHI) {
-					player.playSound(player.getLocation(), Sound.MUSIC_DISC_MELLOHI, 1000f, 1f);
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_MELLOHI, 10000f, 1f);
 				} else if (type == MusicType.STAL) {
-					player.playSound(player.getLocation(), Sound.MUSIC_DISC_STAL, 1000f, 1f);
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_STAL, 10000f, 1f);
 				} else if (type == MusicType.STRAD) {
-					player.playSound(player.getLocation(), Sound.MUSIC_DISC_STRAD, 1000f, 1f);
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_STRAD, 10000f, 1f);
 				} else if (type == MusicType.WAIT) {
-					player.playSound(player.getLocation(), Sound.MUSIC_DISC_WAIT, 1000f, 1f);
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_WAIT, 10000f, 1f);
 				} else if (type == MusicType.WARD) {
-					player.playSound(player.getLocation(), Sound.MUSIC_DISC_WARD, 1000f, 1f);
+					player.playSound(player.getLocation(), Sound.MUSIC_DISC_WARD, 10000f, 1f);
+				}
+
+			}
+
+		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Set Texture Pack")) {
+			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+			if (chestBlock.getType() == Material.CHEST) {
+				Chest chest = (Chest) chestBlock.getState();
+				Inventory inventory = chest.getInventory();
+				ItemStack item = null;
+				String texturePackUrl;
+
+				for (ItemStack content : inventory.getContents()) {
+
+					if (content == null) {
+						continue;
+					}
+
+					if (content.getType() != Material.BOOK) {
+						continue;
+					}
+
+					item = content;
+					break;
+				}
+
+				if (item == null) {
+					return;
+				}
+
+				texturePackUrl = ChatColor.stripColor(item.getItemMeta().getDisplayName());
+
+				if (texturePackUrl != null) {
+					player.setTexturePack(texturePackUrl);
 				}
 
 			}

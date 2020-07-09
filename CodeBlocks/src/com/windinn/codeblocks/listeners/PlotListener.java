@@ -28,7 +28,7 @@ public class PlotListener {
 
 		if (!CodeUtils.isCoding.getOrDefault(Bukkit.getPlayer(player.getUUID()), false)) {
 			CodeUtils.execute(Bukkit.getPlayer(player.getUUID()), EventType.PLAYER_JOIN_PLOT, player.getCurrentPlot(),
-					null);
+					bukkitPlayer.getTargetBlock(null, 5));
 		}
 
 	}

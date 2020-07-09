@@ -10,3 +10,7 @@ commands:
   code:
     description: Toggle coding mode.
     permission: codeblocks.use
+ 
+  play:
+    description: Test your plot!
+    permission: codeblocks.use

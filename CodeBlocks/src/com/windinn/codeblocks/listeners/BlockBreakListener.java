@@ -16,6 +16,7 @@ import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
 import com.windinn.codeblocks.utils.CodeUtils;
+import com.windinn.codeblocks.utils.EventType;
 
 public class BlockBreakListener implements Listener {
 
@@ -34,6 +35,15 @@ public class BlockBreakListener implements Listener {
 				currentPlot = plotPlayer.getCurrentPlot();
 				plotFound = true;
 				break;
+			}
+
+		}
+
+		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
+
+			if (CodeUtils.execute(player, EventType.PLAYER_BLOCK_BREAK, plotPlayer.getCurrentPlot(),
+					player.getTargetBlock(null, 5))) {
+				event.setCancelled(true);
 			}
 
 		}
@@ -69,14 +79,18 @@ public class BlockBreakListener implements Listener {
 		}
 
 		if (block.getType() == Material.DIAMOND_BLOCK) {
-			Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
 
-			if (sign.getLine(0).equals(ChatColor.GREEN + "EVENT")) {
-				event.setCancelled(true);
-				block.getRelative(BlockFace.NORTH).setType(Material.AIR);
-				block.getRelative(BlockFace.EAST).setType(Material.AIR);
-				block.setType(Material.AIR);
-				CodeUtils.removeEvent(block, plotPlayer.getCurrentPlot());
+			if (block.getRelative(BlockFace.EAST).getType() == Material.OAK_WALL_SIGN) {
+				Sign sign = (Sign) block.getRelative(BlockFace.EAST).getState();
+
+				if (sign.getLine(0).equals(ChatColor.GREEN + "EVENT")) {
+					event.setCancelled(true);
+					block.getRelative(BlockFace.NORTH).setType(Material.AIR);
+					block.getRelative(BlockFace.EAST).setType(Material.AIR);
+					block.setType(Material.AIR);
+					CodeUtils.removeEvent(block, plotPlayer.getCurrentPlot());
+				}
+
 			}
 
 		} else if (block.getType() == Material.COBBLESTONE) {
@@ -459,10 +473,6 @@ public class BlockBreakListener implements Listener {
 
 			}
 
-		} else {
-			player.sendMessage(
-					ChatColor.RED + "You can not destroy other blocks than code blocks in development mode!");
-			event.setCancelled(true);
 		}
 
 	}

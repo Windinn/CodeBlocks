@@ -26,7 +26,8 @@ public class EntityDamageListener implements Listener {
 
 			if (!CodeUtils.isCoding.getOrDefault(player, false)) {
 
-				if (CodeUtils.execute(player, EventType.PLAYER_DAMAGE, plotPlayer.getCurrentPlot(), null)) {
+				if (CodeUtils.execute(player, EventType.PLAYER_DAMAGE, plotPlayer.getCurrentPlot(),
+						player.getTargetBlock(null, 5))) {
 					event.setCancelled(true);
 				}
 

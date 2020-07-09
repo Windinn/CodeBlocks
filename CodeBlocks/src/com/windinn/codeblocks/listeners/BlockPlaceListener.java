@@ -60,6 +60,34 @@ public class BlockPlaceListener implements Listener {
 		}
 
 		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
+
+			if (block.getType() == Material.DIAMOND_BLOCK
+					&& item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Event Block")) {
+				player.sendMessage(
+						ChatColor.RED + "Error: " + ChatColor.GRAY + "You must be in coding mode to place codeblocks!");
+				event.setCancelled(true);
+			} else if (block.getType() == Material.COBBLESTONE
+					&& item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Action Block")) {
+				player.sendMessage(
+						ChatColor.RED + "Error: " + ChatColor.GRAY + "You must be in coding mode to place codeblocks!");
+				event.setCancelled(true);
+			} else if (block.getType() == Material.NETHERRACK
+					&& item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Server Action Block")) {
+				player.sendMessage(
+						ChatColor.RED + "Error: " + ChatColor.GRAY + "You must be in coding mode to place codeblocks!");
+				event.setCancelled(true);
+			} else if (block.getType() == Material.RED_WOOL
+					&& item.getItemMeta().getDisplayName().equals(ChatColor.RED + "Redstone Block")) {
+				player.sendMessage(
+						ChatColor.RED + "Error: " + ChatColor.GRAY + "You must be in coding mode to place codeblocks!");
+				event.setCancelled(true);
+			} else if (block.getType() == Material.OAK_PLANKS
+					&& item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Condition Block")) {
+				player.sendMessage(
+						ChatColor.RED + "Error: " + ChatColor.GRAY + "You must be in coding mode to place codeblocks!");
+				event.setCancelled(true);
+			}
+
 			return;
 		}
 
@@ -483,8 +511,7 @@ public class BlockPlaceListener implements Listener {
 			Sign sign = (Sign) state;
 
 			sign.setLine(0, ChatColor.YELLOW + "CONDITION");
-			sign.setLine(1, ChatColor.WHITE + "Target Block");
-			sign.setLine(2, ChatColor.WHITE + "Equals Location");
+			sign.setLine(1, ChatColor.WHITE + "Is Looking At");
 
 			WallSign wallSign = (WallSign) sign.getBlockData();
 			wallSign.setFacing(BlockFace.EAST);

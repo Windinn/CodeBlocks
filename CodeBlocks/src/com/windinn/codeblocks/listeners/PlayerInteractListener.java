@@ -5,6 +5,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -37,6 +39,10 @@ public class PlayerInteractListener implements Listener {
 
 		for (Plot plot : PlotSquared.get().getPlots(player.getUniqueId())) {
 
+			if (plot == null) {
+				continue;
+			}
+
 			if (plot.equals(plotPlayer.getCurrentPlot())) {
 				currentPlot = plotPlayer.getCurrentPlot();
 				break;
@@ -46,6 +52,45 @@ public class PlayerInteractListener implements Listener {
 
 		if (event.getHand() == EquipmentSlot.OFF_HAND) {
 			return;
+		}
+
+		if (event.getClickedBlock() != null) {
+			Block block = event.getClickedBlock();
+
+			if (block.getType() == Material.CHEST) {
+
+				if (block.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST).getType() == Material.OAK_WALL_SIGN) {
+					BlockState state = block.getRelative(BlockFace.DOWN).getRelative(BlockFace.EAST).getState();
+					Sign sign = (Sign) state;
+
+					if (sign.getLine(0).equals(ChatColor.GREEN + "EVENT")
+							|| sign.getLine(0).equals(ChatColor.GOLD + "ACTION")
+							|| sign.getLine(0).equals(ChatColor.RED + "ACTION")
+							|| sign.getLine(0).equals(ChatColor.RED + "REDSTONE")
+							|| sign.getLine(0).equals(ChatColor.YELLOW + "CONDITION")) {
+
+						Location location = block.getLocation();
+						PlotArea plotArea = PlotSquared.get().getPlotAreaAbs(
+								new com.plotsquared.core.location.Location(location.getWorld().getName(),
+										location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+						Plot plot = plotArea
+								.getPlotAbs(new com.plotsquared.core.location.Location(location.getWorld().getName(),
+										location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+
+						if (plot != currentPlot && !player.getName().equals("_Minkizz_")) {
+							player.sendMessage(
+									ChatColor.RED + "You are not allowed to interact with codeblocks chests!");
+							event.setCancelled(true);
+						} else {
+							event.setCancelled(false);
+						}
+
+					}
+
+				}
+
+			}
+
 		}
 
 		if (item != null) {
@@ -259,6 +304,10 @@ public class PlayerInteractListener implements Listener {
 						ChatColor.GRAY + "This event is fired when:",
 						ChatColor.GRAY + "A player takes damage from a block or an entity."));
 
+				inventory.addItem(GuiUtils.createItem(Material.IRON_PICKAXE, ChatColor.GREEN + "Player Break Block",
+						ChatColor.GRAY + "This event is fired when:",
+						ChatColor.GRAY + "A player breaks a block from the plot."));
+
 				player.openInventory(inventory);
 				CodeUtils.savedSigns.put(player, block);
 			} else if (sign.getLine(0).equals(ChatColor.GOLD + "ACTION")) {
@@ -296,12 +345,38 @@ public class PlayerInteractListener implements Listener {
 						ChatColor.GRAY + "This action sets the XP level of a player.",
 						ChatColor.GRAY + "You must put a Number Value for it to work."));
 
+				inventory.addItem(GuiUtils.createItem(Material.EXPERIENCE_BOTTLE, ChatColor.GREEN + "Add XP Level",
+						ChatColor.GRAY + "This action adds XP levels for a player.",
+						ChatColor.GRAY + "You must put a Number Value for it to work."));
+
 				inventory.addItem(GuiUtils.createItem(Material.MUSIC_DISC_CAT, ChatColor.GREEN + "Play Music Disk",
 						ChatColor.GRAY + "This action plays a music disk to the player.",
 						ChatColor.GRAY + "You must put a Music Disk for it to work."));
 
+				inventory.addItem(GuiUtils.createItem(Material.FILLED_MAP, ChatColor.GREEN + "Set Texture Pack",
+						ChatColor.GRAY + "This action sets the texture pack of a player.",
+						ChatColor.GRAY + "You must put a Text Value (with URL) for it to work."));
+
 				player.openInventory(inventory);
 				CodeUtils.savedSigns.put(player, block);
+			} else if (sign.getLine(0).equals(ChatColor.YELLOW + "CONDITION")) {
+
+				if (item != null) {
+
+					if (item.getType() == Material.ARROW
+							&& item.getItemMeta().getDisplayName().equals(ChatColor.RED + "NOT Arrow")) {
+
+						if (sign.getLine(3).equals(ChatColor.RED + "NOT")) {
+							sign.setLine(3, null);
+						} else {
+							sign.setLine(3, ChatColor.RED + "NOT");
+						}
+
+						sign.update();
+					}
+
+				}
+
 			}
 
 		}

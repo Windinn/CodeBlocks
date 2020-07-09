@@ -21,7 +21,8 @@ public class PlayerMoveListener implements Listener {
 		}
 
 		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
-			CodeUtils.execute(player, EventType.PLAYER_MOVE, plotPlayer.getCurrentPlot(), null);
+			CodeUtils.execute(player, EventType.PLAYER_MOVE, plotPlayer.getCurrentPlot(),
+					player.getTargetBlock(null, 5));
 		}
 
 	}

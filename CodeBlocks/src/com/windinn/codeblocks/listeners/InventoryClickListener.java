@@ -37,74 +37,60 @@ public class InventoryClickListener implements Listener {
 			}
 
 			Block signBlock = CodeUtils.savedSigns.get(player);
+			Sign sign = (Sign) signBlock.getState();
 
 			if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Set Gamemode to Survival")) {
-				Sign sign = (Sign) signBlock.getState();
-
 				sign.setLine(1, ChatColor.WHITE + "Set gamemode to:");
 				sign.setLine(2, ChatColor.WHITE + "Survival");
 
 				sign.update();
 			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Set Gamemode to Creative")) {
-				Sign sign = (Sign) signBlock.getState();
-
 				sign.setLine(1, ChatColor.WHITE + "Set gamemode to:");
 				sign.setLine(2, ChatColor.WHITE + "Creative");
 
 				sign.update();
 			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Send Message")) {
-				Sign sign = (Sign) signBlock.getState();
-
 				sign.setLine(1, ChatColor.WHITE + "Send Message");
 				sign.setLine(2, null);
 
 				sign.update();
 			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Teleport")) {
-				Sign sign = (Sign) signBlock.getState();
-
 				sign.setLine(1, ChatColor.WHITE + "Teleport");
 				sign.setLine(2, null);
 
 				sign.update();
 			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Give Items")) {
-				Sign sign = (Sign) signBlock.getState();
-
 				sign.setLine(1, ChatColor.WHITE + "Give Items");
 				sign.setLine(2, null);
 
 				sign.update();
 			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Clear Inventory")) {
-				Sign sign = (Sign) signBlock.getState();
-
 				sign.setLine(1, ChatColor.WHITE + "Clear Inventory");
 				sign.setLine(2, null);
 
 				sign.update();
 			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Set Health")) {
-				Sign sign = (Sign) signBlock.getState();
-
 				sign.setLine(1, ChatColor.WHITE + "Set Health");
 				sign.setLine(2, null);
 
 				sign.update();
 			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Set Max Health")) {
-				Sign sign = (Sign) signBlock.getState();
-
 				sign.setLine(1, ChatColor.WHITE + "Set Max Health");
 				sign.setLine(2, null);
 
 				sign.update();
 			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Set XP Level")) {
-				Sign sign = (Sign) signBlock.getState();
-
 				sign.setLine(1, ChatColor.WHITE + "Set XP Level");
 				sign.setLine(2, null);
 
 				sign.update();
 			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Play Music Disk")) {
-				Sign sign = (Sign) signBlock.getState();
-
 				sign.setLine(1, ChatColor.WHITE + "Play Music Disk");
+				sign.setLine(2, null);
+
+				sign.update();
+			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Set Texture Pack")) {
+				sign.setLine(1, ChatColor.WHITE + "Set Texture Pack");
 				sign.setLine(2, null);
 
 				sign.update();
@@ -160,6 +146,13 @@ public class InventoryClickListener implements Listener {
 				Sign sign = (Sign) signBlock.getState();
 
 				sign.setLine(1, ChatColor.WHITE + "Player Damage");
+				sign.setLine(2, null);
+
+				sign.update();
+			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Player Break Block")) {
+				Sign sign = (Sign) signBlock.getState();
+
+				sign.setLine(1, ChatColor.WHITE + "Break Block");
 				sign.setLine(2, null);
 
 				sign.update();

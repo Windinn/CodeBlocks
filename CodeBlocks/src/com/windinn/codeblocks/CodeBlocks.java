@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.plotsquared.core.api.PlotAPI;
 import com.windinn.codeblocks.commands.CodeCommand;
+import com.windinn.codeblocks.commands.PlayCommand;
 import com.windinn.codeblocks.listeners.AsyncPlayerChatListener;
 import com.windinn.codeblocks.listeners.BlockBreakListener;
 import com.windinn.codeblocks.listeners.BlockPlaceListener;
@@ -26,6 +27,7 @@ public class CodeBlocks extends JavaPlugin {
 		saveDefaultConfig();
 
 		getCommand("code").setExecutor(new CodeCommand());
+		getCommand("play").setExecutor(new PlayCommand());
 
 		getServer().getPluginManager().registerEvents(new AsyncPlayerChatListener(), this);
 		getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);

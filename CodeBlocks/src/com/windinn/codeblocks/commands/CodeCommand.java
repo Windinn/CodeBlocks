@@ -58,13 +58,15 @@ public class CodeCommand implements CommandExecutor {
 								.addItem(GuiUtils.createItem(Material.RED_WOOL, ChatColor.RED + "Redstone Block",
 										ChatColor.GRAY + "Use this to connect redstone to event blocks."));
 
-						if (player.getName().equals("_Minkizz_")) {
-							player.getInventory()
-									.addItem(GuiUtils.createItem(Material.OAK_PLANKS,
-											ChatColor.YELLOW + "Condition Block",
-											ChatColor.GRAY + "Use this to put conditions in your code.",
-											ChatColor.GRAY + "Exemple: detect right clicking a block"));
-						}
+						player.getInventory()
+								.addItem(GuiUtils.createItem(Material.OAK_PLANKS, ChatColor.YELLOW + "Condition Block",
+										ChatColor.GRAY + "Use this to put conditions in your code.",
+										ChatColor.GRAY + "Exemple: detect right clicking a block"));
+
+						player.getInventory()
+								.addItem(GuiUtils.createItem(Material.ARROW, ChatColor.RED + "NOT Arrow",
+										ChatColor.GRAY + "Use this to inverse conditions.",
+										ChatColor.GRAY + "Exemple: if player is NOT sneaking"));
 
 						player.getInventory().setItem(7,
 								GuiUtils.createItem(Material.NETHER_STAR, ChatColor.GREEN + "Request Support",
