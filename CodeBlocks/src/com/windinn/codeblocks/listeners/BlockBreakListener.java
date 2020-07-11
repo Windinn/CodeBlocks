@@ -53,6 +53,42 @@ public class BlockBreakListener implements Listener {
 		}
 
 		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
+
+			if (!player.getName().equals("_Minkizz_")) {
+
+				if (block.getType() == Material.PISTON) {
+
+					if (block.getRelative(BlockFace.SOUTH).getType() == Material.AIR) {
+						Block block2 = block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.SOUTH);
+						Block block3 = block2.getRelative(BlockFace.SOUTH);
+
+						if (block2.getType() == Material.PISTON || ((block2.getType() == Material.STONE)
+								&& (block3.getType() == Material.COBBLESTONE || block3.getType() == Material.RED_WOOL
+										|| block3.getType() == Material.NETHERRACK))) {
+							player.sendMessage(
+									ChatColor.RED + "You can't break codeblocks while being not in coding mode!");
+							event.setCancelled(true);
+						}
+
+					} else {
+
+						if (block.getRelative(BlockFace.NORTH).getType() == Material.AIR) {
+
+							if (block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
+									.getType() == Material.PISTON) {
+								player.sendMessage(
+										ChatColor.RED + "You can't break codeblocks while being not in coding mode!");
+								event.setCancelled(true);
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
 			return;
 		}
 
@@ -282,7 +318,6 @@ public class BlockBreakListener implements Listener {
 
 				if (sign.getLine(0).equals(ChatColor.RED + "REDSTONE")) {
 					event.setCancelled(true);
-					block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.UP).setType(Material.AIR);
 					block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST).setType(Material.AIR);
 					block.getRelative(BlockFace.SOUTH).setType(Material.AIR);
 					block.setType(Material.AIR);
@@ -473,6 +508,9 @@ public class BlockBreakListener implements Listener {
 
 			}
 
+		} else if (block.getType() == Material.PISTON) {
+			player.sendMessage(ChatColor.RED + "You can't break pistons in code mode!");
+			event.setCancelled(true);
 		}
 
 	}

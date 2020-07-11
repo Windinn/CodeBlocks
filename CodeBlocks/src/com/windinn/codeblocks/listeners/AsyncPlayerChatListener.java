@@ -9,6 +9,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.windinn.codeblocks.utils.CooldownManager;
+
 public class AsyncPlayerChatListener implements Listener {
 
 	@EventHandler
@@ -20,6 +22,14 @@ public class AsyncPlayerChatListener implements Listener {
 		if (item == null) {
 			return;
 		}
+
+		if (CooldownManager.isInChatCooldown(player)) {
+			player.sendMessage(ChatColor.RED + "You are in chat cooldown!");
+			event.setCancelled(true);
+			return;
+		}
+
+		CooldownManager.setInChatCooldown(player, true);
 
 		if (item.getType() == Material.BOOK) {
 

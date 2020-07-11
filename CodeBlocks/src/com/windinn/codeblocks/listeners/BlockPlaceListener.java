@@ -1,5 +1,8 @@
 package com.windinn.codeblocks.listeners;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -153,6 +156,7 @@ public class BlockPlaceListener implements Listener {
 			int i = 0;
 			int b = block.getRelative(BlockFace.NORTH).getLocation().getBlockZ();
 			Block current = new Location(block.getWorld(), block.getX(), block.getY(), b).getBlock();
+			Map<Block, BlockData> oldBlockData = new HashMap<>();
 
 			if (current.getType() != Material.AIR) {
 
@@ -160,7 +164,8 @@ public class BlockPlaceListener implements Listener {
 					current = new Location(block.getWorld(), block.getX(), block.getY(), z).getBlock();
 					int finalZ = current.getLocation().getBlockZ() - 2;
 
-					if (current.getType() == Material.AIR) {
+					if (current.getType() == Material.AIR
+							&& current.getRelative(BlockFace.NORTH).getType() != Material.PISTON) {
 						break;
 					}
 
@@ -169,11 +174,15 @@ public class BlockPlaceListener implements Listener {
 					final Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), finalZ)
 							.getBlock();
 
-					if (newBlock.getType() != Material.AIR) {
+					if (newBlock.getType() == Material.PISTON) {
+						finalZ -= 2;
+					} else if (newBlock.getType() != Material.AIR) {
 						player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
 						event.setCancelled(true);
-						break;
+						return;
 					}
+
+					int realFinalZ = finalZ;
 
 					Location testLocation = newBlock.getLocation();
 					PlotArea plotArea2 = PlotSquared.get()
@@ -184,7 +193,13 @@ public class BlockPlaceListener implements Listener {
 							.getPlotAbs(new com.plotsquared.core.location.Location(testLocation.getWorld().getName(),
 									testLocation.getBlockX(), testLocation.getBlockY(), testLocation.getBlockZ()));
 
-					if (plot2 != currentPlot && !player.getName().equals("_Minkizz_")) {
+					if ((newBlock.getRelative(BlockFace.SOUTH).getType() != Material.AIR)
+							|| (plot2 != currentPlot && !player.getName().equals("_Minkizz_"))) {
+
+						for (Block block2 : oldBlockData.keySet()) {
+							block2.setBlockData(oldBlockData.get(block2));
+						}
+
 						player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
 						event.setCancelled(true);
 						return;
@@ -194,10 +209,12 @@ public class BlockPlaceListener implements Listener {
 
 						@Override
 						public void run() {
-							Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), finalZ)
+							Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), realFinalZ)
 									.getBlock();
+							oldBlockData.put(newBlock, newBlock.getBlockData());
 							newBlock.setBlockData(blockData);
-							finalCurrent.setType(Material.STONE);
+
+							finalCurrent.setBlockData(finalCurrent.getBlockData());
 						}
 
 					}, 1L);
@@ -242,6 +259,7 @@ public class BlockPlaceListener implements Listener {
 			int i = 0;
 			int b = block.getRelative(BlockFace.NORTH).getLocation().getBlockZ();
 			Block current = new Location(block.getWorld(), block.getX(), block.getY(), b).getBlock();
+			Map<Block, BlockData> oldBlockData = new HashMap<>();
 
 			if (current.getType() != Material.AIR) {
 
@@ -249,20 +267,33 @@ public class BlockPlaceListener implements Listener {
 					current = new Location(block.getWorld(), block.getX(), block.getY(), z).getBlock();
 					int finalZ = current.getLocation().getBlockZ() - 2;
 
-					if (current.getType() == Material.AIR) {
+					if (current.getType() == Material.AIR
+							&& current.getRelative(BlockFace.NORTH).getType() != Material.PISTON) {
 						break;
 					}
 
 					final Block finalCurrent = current;
 					final BlockData blockData = finalCurrent.getBlockData();
+					final Block newBlock1 = new Location(block.getWorld(), block.getX(), block.getY(), finalZ)
+							.getBlock();
+
+					if (newBlock1.getType() == Material.PISTON) {
+						finalZ -= 2;
+					} else if (newBlock1.getType() != Material.AIR) {
+
+						for (Block block2 : oldBlockData.keySet()) {
+							block2.setBlockData(oldBlockData.get(block2));
+						}
+
+						player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
+						event.setCancelled(true);
+						return;
+					}
+
 					final Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), finalZ)
 							.getBlock();
 
-					if (newBlock.getType() != Material.AIR) {
-						player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
-						event.setCancelled(true);
-						break;
-					}
+					int realFinalZ = finalZ;
 
 					Location testLocation = newBlock.getLocation();
 					PlotArea plotArea2 = PlotSquared.get()
@@ -273,7 +304,13 @@ public class BlockPlaceListener implements Listener {
 							.getPlotAbs(new com.plotsquared.core.location.Location(testLocation.getWorld().getName(),
 									testLocation.getBlockX(), testLocation.getBlockY(), testLocation.getBlockZ()));
 
-					if (plot2 != currentPlot && !player.getName().equals("_Minkizz_")) {
+					if ((newBlock.getRelative(BlockFace.SOUTH).getType() != Material.AIR)
+							|| (plot2 != currentPlot && !player.getName().equals("_Minkizz_"))) {
+
+						for (Block block2 : oldBlockData.keySet()) {
+							block2.setBlockData(oldBlockData.get(block2));
+						}
+
 						player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
 						event.setCancelled(true);
 						return;
@@ -283,10 +320,12 @@ public class BlockPlaceListener implements Listener {
 
 						@Override
 						public void run() {
-							Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), finalZ)
+							Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), realFinalZ)
 									.getBlock();
+							oldBlockData.put(newBlock, newBlock.getBlockData());
 							newBlock.setBlockData(blockData);
-							finalCurrent.setType(Material.STONE);
+
+							finalCurrent.setBlockData(finalCurrent.getBlockData());
 						}
 
 					}, 1L);
@@ -298,6 +337,10 @@ public class BlockPlaceListener implements Listener {
 					i++;
 				}
 
+			}
+
+			for (Block block2 : oldBlockData.keySet()) {
+				block2.setBlockData(oldBlockData.get(block2));
 			}
 
 			block.getRelative(BlockFace.UP).setType(Material.CHEST);
@@ -330,6 +373,7 @@ public class BlockPlaceListener implements Listener {
 			int i = 0;
 			int b = block.getRelative(BlockFace.NORTH).getLocation().getBlockZ();
 			Block current = new Location(block.getWorld(), block.getX(), block.getY(), b).getBlock();
+			Map<Block, BlockData> oldBlockData = new HashMap<>();
 
 			if (current.getType() != Material.AIR) {
 
@@ -337,20 +381,33 @@ public class BlockPlaceListener implements Listener {
 					current = new Location(block.getWorld(), block.getX(), block.getY(), z).getBlock();
 					int finalZ = current.getLocation().getBlockZ() - 2;
 
-					if (current.getType() == Material.AIR) {
+					if (current.getType() == Material.AIR
+							&& current.getRelative(BlockFace.NORTH).getType() != Material.PISTON) {
 						break;
 					}
 
 					final Block finalCurrent = current;
 					final BlockData blockData = finalCurrent.getBlockData();
+					final Block newBlock1 = new Location(block.getWorld(), block.getX(), block.getY(), finalZ)
+							.getBlock();
+
+					if (newBlock1.getType() == Material.PISTON) {
+						finalZ -= 2;
+					} else if (newBlock1.getType() != Material.AIR) {
+
+						for (Block block2 : oldBlockData.keySet()) {
+							block2.setBlockData(oldBlockData.get(block2));
+						}
+
+						player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
+						event.setCancelled(true);
+						return;
+					}
+
 					final Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), finalZ)
 							.getBlock();
 
-					if (newBlock.getType() != Material.AIR) {
-						player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
-						event.setCancelled(true);
-						break;
-					}
+					int realFinalZ = finalZ;
 
 					Location testLocation = newBlock.getLocation();
 					PlotArea plotArea2 = PlotSquared.get()
@@ -361,7 +418,13 @@ public class BlockPlaceListener implements Listener {
 							.getPlotAbs(new com.plotsquared.core.location.Location(testLocation.getWorld().getName(),
 									testLocation.getBlockX(), testLocation.getBlockY(), testLocation.getBlockZ()));
 
-					if (plot2 != currentPlot && !player.getName().equals("_Minkizz_")) {
+					if ((newBlock.getRelative(BlockFace.SOUTH).getType() != Material.AIR)
+							|| (plot2 != currentPlot && !player.getName().equals("_Minkizz_"))) {
+
+						for (Block block2 : oldBlockData.keySet()) {
+							block2.setBlockData(oldBlockData.get(block2));
+						}
+
 						player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
 						event.setCancelled(true);
 						return;
@@ -371,10 +434,12 @@ public class BlockPlaceListener implements Listener {
 
 						@Override
 						public void run() {
-							Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), finalZ)
+							Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), realFinalZ)
 									.getBlock();
+							oldBlockData.put(newBlock, newBlock.getBlockData());
 							newBlock.setBlockData(blockData);
-							finalCurrent.setType(Material.STONE);
+
+							finalCurrent.setBlockData(finalCurrent.getBlockData());
 						}
 
 					}, 1L);
@@ -386,6 +451,10 @@ public class BlockPlaceListener implements Listener {
 					i++;
 				}
 
+			}
+
+			for (Block block2 : oldBlockData.keySet()) {
+				block2.setBlockData(oldBlockData.get(block2));
 			}
 
 			block.getRelative(BlockFace.NORTH).setType(Material.STONE);
@@ -421,6 +490,7 @@ public class BlockPlaceListener implements Listener {
 			int i = 0;
 			int b = block.getRelative(BlockFace.NORTH).getLocation().getBlockZ();
 			Block current = new Location(block.getWorld(), block.getX(), block.getY(), b).getBlock();
+			Map<Block, BlockData> oldBlockData = new HashMap<>();
 
 			if (block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
 					.getType() != Material.AIR
@@ -445,14 +515,24 @@ public class BlockPlaceListener implements Listener {
 
 					final Block finalCurrent = current;
 					final BlockData blockData = finalCurrent.getBlockData();
-					final Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), finalZ)
+					final Block newBlock1 = new Location(block.getWorld(), block.getX(), block.getY(), finalZ)
 							.getBlock();
 
-					if (newBlock.getType() != Material.AIR) {
+					if (newBlock1.getType() == Material.PISTON) {
+						finalZ -= 2;
+					} else if (newBlock1.getType() != Material.AIR) {
+
+						for (Block block2 : oldBlockData.keySet()) {
+							block2.setBlockData(oldBlockData.get(block2));
+						}
+
 						player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
 						event.setCancelled(true);
 						break;
 					}
+
+					final Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), finalZ)
+							.getBlock();
 
 					Location testLocation = newBlock.getLocation();
 					PlotArea plotArea2 = PlotSquared.get()
@@ -464,16 +544,23 @@ public class BlockPlaceListener implements Listener {
 									testLocation.getBlockX(), testLocation.getBlockY(), testLocation.getBlockZ()));
 
 					if (plot2 != currentPlot) {
+
+						for (Block block2 : oldBlockData.keySet()) {
+							block2.setBlockData(oldBlockData.get(block2));
+						}
+
 						player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
 						event.setCancelled(true);
-						return;
+						break;
 					}
+
+					final int realFinalZ = finalZ;
 
 					Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(CodeBlocks.class), new Runnable() {
 
 						@Override
 						public void run() {
-							Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), finalZ)
+							Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), realFinalZ)
 									.getBlock();
 							newBlock.setBlockData(blockData);
 							finalCurrent.setType(Material.STONE);

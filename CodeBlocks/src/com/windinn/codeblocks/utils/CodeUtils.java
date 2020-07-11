@@ -148,6 +148,7 @@ public final class CodeUtils {
 
 			int conditionX = 0;
 			boolean canExecute = true;
+			int x = 0;
 
 			for (int z = realLoc.getBlockZ(); true; z--) {
 				Block block = new Location(realLoc.getWorld(), realLoc.getX(), realLoc.getY(), z).getBlock();
@@ -160,6 +161,8 @@ public final class CodeUtils {
 					conditionX = 0;
 					canExecute = true;
 				}
+
+				x++;
 
 				if (canExecute) {
 
@@ -238,6 +241,10 @@ public final class CodeUtils {
 
 				}
 
+				if (x >= 256) {
+					break;
+				}
+
 			}
 
 		}
@@ -302,6 +309,56 @@ public final class CodeUtils {
 				}
 
 				if (LocationUtils.simpleLocationToString(targetBlock.getLocation()).equals(locationString)) {
+
+					if (inversed) {
+						return false;
+					} else {
+						return true;
+					}
+
+				} else {
+
+					if (inversed) {
+						return true;
+					} else {
+						return false;
+					}
+
+				}
+
+			}
+
+		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Is Sneaking")) {
+			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+			if (chestBlock.getType() == Material.CHEST) {
+
+				if (player.isSneaking()) {
+
+					if (inversed) {
+						return false;
+					} else {
+						return true;
+					}
+
+				} else {
+
+					if (inversed) {
+						return true;
+					} else {
+						return false;
+					}
+
+				}
+
+			}
+
+		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Is Sprinting")) {
+			Block chestBlock = sign.getBlock().getRelative(BlockFace.WEST).getRelative(BlockFace.UP);
+
+			if (chestBlock.getType() == Material.CHEST) {
+
+				if (player.isSprinting()) {
 
 					if (inversed) {
 						return false;

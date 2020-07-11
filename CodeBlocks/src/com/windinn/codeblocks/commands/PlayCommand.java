@@ -1,6 +1,7 @@
 package com.windinn.codeblocks.commands;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -23,6 +24,7 @@ public class PlayCommand implements CommandExecutor {
 			player.getInventory().clear();
 
 			player.setGameMode(GameMode.CREATIVE);
+			player.sendMessage(ChatColor.GREEN + "You entered play mode.");
 
 			CodeUtils.execute(Bukkit.getPlayer(player.getUniqueId()), EventType.PLAYER_JOIN_PLOT,
 					plotPlayer.getCurrentPlot(), player.getTargetBlock(null, 5));

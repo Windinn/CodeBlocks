@@ -84,6 +84,11 @@ public class InventoryClickListener implements Listener {
 				sign.setLine(2, null);
 
 				sign.update();
+			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Add XP Level")) {
+				sign.setLine(1, ChatColor.WHITE + "Add XP Level");
+				sign.setLine(2, null);
+
+				sign.update();
 			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Play Music Disk")) {
 				sign.setLine(1, ChatColor.WHITE + "Play Music Disk");
 				sign.setLine(2, null);
@@ -153,6 +158,40 @@ public class InventoryClickListener implements Listener {
 				Sign sign = (Sign) signBlock.getState();
 
 				sign.setLine(1, ChatColor.WHITE + "Break Block");
+				sign.setLine(2, null);
+
+				sign.update();
+			}
+
+			player.closeInventory();
+			event.setCancelled(true);
+		} else if (view.getTitle().equals("Modify Condition Block")) {
+
+			if (!CodeUtils.savedSigns.containsKey(player)) {
+				player.sendMessage(ChatColor.RED + "An error occured, please reclick the sign again.");
+				return;
+			}
+
+			Block signBlock = CodeUtils.savedSigns.get(player);
+
+			if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Is Looking At Block")) {
+				Sign sign = (Sign) signBlock.getState();
+
+				sign.setLine(1, ChatColor.WHITE + "Is Looking At");
+				sign.setLine(2, null);
+
+				sign.update();
+			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Is Sneaking")) {
+				Sign sign = (Sign) signBlock.getState();
+
+				sign.setLine(1, ChatColor.WHITE + "Is Sneaking");
+				sign.setLine(2, null);
+
+				sign.update();
+			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Is Sprinting")) {
+				Sign sign = (Sign) signBlock.getState();
+
+				sign.setLine(1, ChatColor.WHITE + "Is Sprinting");
 				sign.setLine(2, null);
 
 				sign.update();
