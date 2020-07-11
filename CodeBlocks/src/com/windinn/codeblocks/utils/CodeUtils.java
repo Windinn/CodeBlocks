@@ -241,7 +241,7 @@ public final class CodeUtils {
 
 				}
 
-				if (x >= 256) {
+				if (x >= 200) {
 					break;
 				}
 
@@ -502,7 +502,10 @@ public final class CodeUtils {
 					return;
 				}
 
-				player.setHealth(health);
+				if (health >= 0) {
+					player.setHealth(health);
+				}
+
 			}
 
 		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Set Max Health")) {
@@ -538,7 +541,10 @@ public final class CodeUtils {
 					return;
 				}
 
-				player.setMaxHealth(health);
+				if (health >= 1) {
+					player.setMaxHealth(health);
+				}
+
 			}
 
 		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Set XP Level")) {
@@ -574,7 +580,10 @@ public final class CodeUtils {
 					return;
 				}
 
-				player.setLevel((int) Math.round(level));
+				if ((int) Math.round(level) >= 0) {
+					player.setLevel((int) Math.round(level));
+				}
+
 			}
 
 		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Add XP Level")) {
@@ -610,7 +619,12 @@ public final class CodeUtils {
 					return;
 				}
 
-				player.setLevel(player.getLevel() + ((int) Math.round(level)));
+				int x = player.getLevel() + ((int) Math.round(level));
+
+				if (x >= 0) {
+					player.setLevel(x);
+				}
+
 			}
 
 		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Play Music Disk")) {
