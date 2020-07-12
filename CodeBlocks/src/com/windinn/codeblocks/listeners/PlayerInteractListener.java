@@ -77,7 +77,7 @@ public class PlayerInteractListener implements Listener {
 								.getPlotAbs(new com.plotsquared.core.location.Location(location.getWorld().getName(),
 										location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
-						if (plot != currentPlot && !player.getName().equals("_Minkizz_")) {
+						if (plot != currentPlot && !player.isOp()) {
 							player.sendMessage(
 									ChatColor.RED + "You are not allowed to interact with codeblocks chests!");
 							event.setCancelled(true);
@@ -142,7 +142,7 @@ public class PlayerInteractListener implements Listener {
 
 								}
 
-								if (!plotFound && !player.getName().equals("_Minkizz_")) {
+								if (!plotFound && !player.isOp()) {
 									player.sendMessage(ChatColor.RED + "The location must be located in your plot!");
 									event.setCancelled(true);
 									return;
@@ -158,7 +158,7 @@ public class PlayerInteractListener implements Listener {
 											new com.plotsquared.core.location.Location(location.getWorld().getName(),
 													location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
-									if (plot != currentPlot && !player.getName().equals("_Minkizz_")) {
+									if (plot != currentPlot && !player.isOp()) {
 										player.sendMessage(
 												ChatColor.RED + "The location must be located in your plot!");
 										event.setCancelled(true);
@@ -192,18 +192,21 @@ public class PlayerInteractListener implements Listener {
 
 			} else if (item.getType() == Material.NETHER_STAR
 					&& item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Request Support")) {
-				Player minkizz = Bukkit.getPlayer("_Minkizz_");
 
 				if (CooldownManager.isInSupportCooldown(player)) {
 					player.sendMessage(ChatColor.RED + "Please wait before calling support again!");
 					return;
 				}
 
-				if (minkizz == null) {
-					player.sendMessage(ChatColor.RED + "I am sorry, the creator of CodeBlocks is offline.");
-				} else {
-					minkizz.sendMessage(ChatColor.GOLD + player.getName() + " requested help!");
-					player.sendMessage(ChatColor.GREEN + "You asked for help. Please wait a bit.");
+				player.sendMessage(ChatColor.GREEN + "You asked for help. Please wait a bit.");
+
+				for (Player player2 : Bukkit.getOnlinePlayers()) {
+
+					if (!player2.isOp()) {
+						continue;
+					}
+
+					player2.sendMessage(ChatColor.GOLD + player.getName() + " requested help!");
 				}
 
 				CooldownManager.setInSupportCooldown(player, true);
@@ -263,7 +266,7 @@ public class PlayerInteractListener implements Listener {
 
 			}
 
-			if (player.getName().equals("_Minkizz_")) {
+			if (player.isOp()) {
 				plotFound = true;
 			}
 

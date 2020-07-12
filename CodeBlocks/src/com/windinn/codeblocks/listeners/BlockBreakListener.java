@@ -48,13 +48,13 @@ public class BlockBreakListener implements Listener {
 
 		}
 
-		if (player.getName().equals("_Minkizz_")) {
+		if (player.isOp()) {
 			plotFound = true;
 		}
 
 		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
 
-			if (!player.getName().equals("_Minkizz_")) {
+			if (!player.isOp()) {
 
 				if (block.getType() == Material.PISTON) {
 
@@ -104,7 +104,7 @@ public class BlockBreakListener implements Listener {
 		Plot plot = plotArea.getPlotAbs(new com.plotsquared.core.location.Location(location.getWorld().getName(),
 				location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
-		if (plot != currentPlot && !player.getName().equals("_Minkizz_")) {
+		if (plot != currentPlot && !player.isOp()) {
 			player.sendMessage(ChatColor.RED + "The location must be located in your plot!");
 			event.setCancelled(true);
 			return;
