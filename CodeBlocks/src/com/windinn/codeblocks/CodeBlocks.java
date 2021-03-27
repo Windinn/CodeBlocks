@@ -4,7 +4,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.plotsquared.core.api.PlotAPI;
 import com.windinn.codeblocks.commands.CodeCommand;
 import com.windinn.codeblocks.commands.PlayCommand;
 import com.windinn.codeblocks.listeners.AsyncPlayerChatListener;
@@ -15,7 +14,6 @@ import com.windinn.codeblocks.listeners.InventoryClickListener;
 import com.windinn.codeblocks.listeners.PlayerInteractListener;
 import com.windinn.codeblocks.listeners.PlayerJoinListener;
 import com.windinn.codeblocks.listeners.PlayerMoveListener;
-import com.windinn.codeblocks.listeners.PlotListener;
 import com.windinn.codeblocks.utils.CodeUtils;
 
 public class CodeBlocks extends JavaPlugin {
@@ -48,14 +46,12 @@ public class CodeBlocks extends JavaPlugin {
 		}
 
 		CodeUtils.setPlugin(this);
-
-		PlotAPI plotApi = new PlotAPI();
-		plotApi.registerListener(new PlotListener());
 	}
 
 	@Override
 	public void onDisable() {
 		super.onDisable();
+		Bukkit.getScheduler().cancelTasks(this);
 	}
 
 }

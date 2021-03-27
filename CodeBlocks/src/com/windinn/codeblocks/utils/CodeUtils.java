@@ -21,8 +21,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.plotsquared.core.plot.Plot;
-
 public final class CodeUtils {
 
 	public static Map<Player, Block> savedSigns;
@@ -39,14 +37,14 @@ public final class CodeUtils {
 		savedSigns = new HashMap<>();
 	}
 
-	public static void addEvent(Block block, Plot plot) {
+	public static void addEvent(Block block) {
 		List<String> locations = plugin.getConfig().getStringList("eventBlocks");
 
 		if (locations == null) {
 			locations = new ArrayList<>();
 		}
 
-		String loc = LocationUtils.locationToString(block.getLocation(), plot);
+		String loc = LocationUtils.simpleLocationToString(block.getLocation());
 
 		if (!locations.contains(loc)) {
 			locations.add(loc);
@@ -56,20 +54,15 @@ public final class CodeUtils {
 		plugin.saveConfig();
 	}
 
-	public static void removeEvent(Block block, Plot plot) {
-		removeEvent(block, plot.getId().getX(), plot.getId().getY());
-	}
-
-	public static void removeEvent(Block block, int plotIdX, int plotIdY) {
+	public static void removeEvent(Block block) {
 		List<String> events = getEvents();
 		Iterator<String> iterator = events.iterator();
 
 		while (iterator.hasNext()) {
 			String locationStr = iterator.next();
-			CustomLocation location = LocationUtils.stringToLocation(locationStr);
+			Location location = LocationUtils.simpleStringToLocation(locationStr);
 
-			if (location.getLocation().equals(block.getLocation()) && location.getPlotIdX() == plotIdX
-					&& location.getPlotIdY() == plotIdY) {
+			if (location.equals(block.getLocation())) {
 				iterator.remove();
 			}
 
@@ -89,39 +82,33 @@ public final class CodeUtils {
 		return locations;
 	}
 
-	public static boolean execute(Player player, EventType event, Plot plot, Block targetBlock) {
+	public static boolean execute(Player player, EventType event, Block targetBlock) {
 		boolean cancel = false;
 
-		if (plot == null) {
-			return false;
-		}
-
 		for (String eventBlock : getEvents()) {
-			CustomLocation loc = LocationUtils.stringToLocation(eventBlock);
+			Location loc = LocationUtils.simpleStringToLocation(eventBlock);
 
-			if (plot.getId().getX() != loc.getPlotIdX() || plot.getId().getY() != loc.getPlotIdY()) {
+			if (!loc.getWorld().equals(player.getWorld())) {
 				continue;
 			}
 
-			Location realLoc = loc.getLocation();
-
-			if (realLoc.getBlock().getType() != Material.DIAMOND_BLOCK) {
-				removeEvent(realLoc.getBlock(), loc.getPlotIdX(), loc.getPlotIdY());
+			if (loc.getBlock().getType() != Material.DIAMOND_BLOCK) {
+				removeEvent(loc.getBlock());
 				continue;
 			}
 
-			Block eventSignBlock = realLoc.getBlock().getRelative(BlockFace.EAST);
+			Block eventSignBlock = loc.getBlock().getRelative(BlockFace.EAST);
 
 			if (eventSignBlock.getType() != Material.OAK_WALL_SIGN) {
-				removeEvent(realLoc.getBlock(), loc.getPlotIdX(), loc.getPlotIdY());
+				removeEvent(loc.getBlock());
 				continue;
 			}
 
 			Sign eventSign = (Sign) eventSignBlock.getState();
 			boolean pass = false;
 
-			if (event == EventType.PLAYER_JOIN_PLOT
-					&& eventSign.getLine(1).equals(ChatColor.WHITE + "Player Join Plot")) {
+			if (event == EventType.PLAYER_JOIN_WORLD
+					&& eventSign.getLine(1).equals(ChatColor.WHITE + "Player Join World")) {
 				pass = true;
 			} else if (event == EventType.PLAYER_INTERACT
 					&& eventSign.getLine(1).equals(ChatColor.WHITE + "Player Interact")) {
@@ -150,8 +137,8 @@ public final class CodeUtils {
 			boolean canExecute = true;
 			int x = 0;
 
-			for (int z = realLoc.getBlockZ(); true; z--) {
-				Block block = new Location(realLoc.getWorld(), realLoc.getX(), realLoc.getY(), z).getBlock();
+			for (int z = loc.getBlockZ(); true; z--) {
+				Block block = new Location(loc.getWorld(), loc.getX(), loc.getY(), z).getBlock();
 
 				if (block.getType() == Material.PISTON) {
 					conditionX--;

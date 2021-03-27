@@ -112,10 +112,10 @@ public class InventoryClickListener implements Listener {
 
 			Block signBlock = CodeUtils.savedSigns.get(player);
 
-			if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Player Join Plot")) {
+			if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Player Join World")) {
 				Sign sign = (Sign) signBlock.getState();
 
-				sign.setLine(1, ChatColor.WHITE + "Player Join Plot");
+				sign.setLine(1, ChatColor.WHITE + "Player Join World");
 				sign.setLine(2, null);
 
 				sign.update();

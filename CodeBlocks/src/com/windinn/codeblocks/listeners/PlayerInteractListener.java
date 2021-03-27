@@ -18,10 +18,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.plotsquared.core.PlotSquared;
-import com.plotsquared.core.player.PlotPlayer;
-import com.plotsquared.core.plot.Plot;
-import com.plotsquared.core.plot.PlotArea;
 import com.windinn.codeblocks.utils.CodeUtils;
 import com.windinn.codeblocks.utils.CooldownManager;
 import com.windinn.codeblocks.utils.EventType;
@@ -34,21 +30,6 @@ public class PlayerInteractListener implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
-		Plot currentPlot = null;
-		PlotPlayer plotPlayer = PlotPlayer.get(player.getName());
-
-		for (Plot plot : PlotSquared.get().getPlots(player.getUniqueId())) {
-
-			if (plot == null) {
-				continue;
-			}
-
-			if (plot.equals(plotPlayer.getCurrentPlot())) {
-				currentPlot = plotPlayer.getCurrentPlot();
-				break;
-			}
-
-		}
 
 		if (event.getHand() == EquipmentSlot.OFF_HAND) {
 			return;
@@ -70,14 +51,8 @@ public class PlayerInteractListener implements Listener {
 							|| sign.getLine(0).equals(ChatColor.YELLOW + "CONDITION")) {
 
 						Location location = block.getLocation();
-						PlotArea plotArea = PlotSquared.get().getPlotAreaAbs(
-								new com.plotsquared.core.location.Location(location.getWorld().getName(),
-										location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-						Plot plot = plotArea
-								.getPlotAbs(new com.plotsquared.core.location.Location(location.getWorld().getName(),
-										location.getBlockX(), location.getBlockY(), location.getBlockZ()));
 
-						if (plot != currentPlot && !player.isOp()) {
+						if (!player.isOp()) {
 							player.sendMessage(
 									ChatColor.RED + "You are not allowed to interact with codeblocks chests!");
 							event.setCancelled(true);
@@ -131,39 +106,9 @@ public class PlayerInteractListener implements Listener {
 
 							if (item.getItemMeta().getLore().get(1)
 									.equals(ChatColor.GRAY + "To set the location value")) {
-								boolean plotFound = false;
-
-								for (Plot plot : PlotSquared.get().getPlots(player.getUniqueId())) {
-
-									if (plot.equals(plotPlayer.getCurrentPlot())) {
-										plotFound = true;
-										break;
-									}
-
-								}
-
-								if (!plotFound && !player.isOp()) {
-									player.sendMessage(ChatColor.RED + "The location must be located in your plot!");
-									event.setCancelled(true);
-									return;
-								}
 
 								if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 									Location location = event.getClickedBlock().getLocation();
-									PlotArea plotArea = PlotSquared.get()
-											.getPlotAreaAbs(new com.plotsquared.core.location.Location(
-													location.getWorld().getName(), location.getBlockX(),
-													location.getBlockY(), location.getBlockZ()));
-									Plot plot = plotArea.getPlotAbs(
-											new com.plotsquared.core.location.Location(location.getWorld().getName(),
-													location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-
-									if (plot != currentPlot && !player.isOp()) {
-										player.sendMessage(
-												ChatColor.RED + "The location must be located in your plot!");
-										event.setCancelled(true);
-										return;
-									}
 
 									ItemMeta meta = item.getItemMeta();
 									meta.setDisplayName(ChatColor.RESET + LocationUtils
@@ -216,29 +161,22 @@ public class PlayerInteractListener implements Listener {
 
 		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
 
-			if (plotPlayer != null) {
+			if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 
-				if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-
-					if (CodeUtils.execute(player, EventType.PLAYER_RIGHT_CLICK, plotPlayer.getCurrentPlot(),
-							event.getClickedBlock())) {
-						event.setCancelled(true);
-					}
-
-				} else if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-
-					if (CodeUtils.execute(player, EventType.PLAYER_LEFT_CLICK, plotPlayer.getCurrentPlot(),
-							event.getClickedBlock())) {
-						event.setCancelled(true);
-					}
-
-				}
-
-				if (CodeUtils.execute(player, EventType.PLAYER_INTERACT, plotPlayer.getCurrentPlot(),
-						event.getClickedBlock())) {
+				if (CodeUtils.execute(player, EventType.PLAYER_RIGHT_CLICK, event.getClickedBlock())) {
 					event.setCancelled(true);
 				}
 
+			} else if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+
+				if (CodeUtils.execute(player, EventType.PLAYER_LEFT_CLICK, event.getClickedBlock())) {
+					event.setCancelled(true);
+				}
+
+			}
+
+			if (CodeUtils.execute(player, EventType.PLAYER_INTERACT, event.getClickedBlock())) {
+				event.setCancelled(true);
 			}
 
 		}
@@ -253,39 +191,14 @@ public class PlayerInteractListener implements Listener {
 
 		Block block = event.getClickedBlock();
 
-		if (block.getType() == Material.OAK_WALL_SIGN || block.getType() == Material.CHEST) {
-			boolean plotFound = false;
-
-			for (Plot plot : PlotSquared.get().getPlots(player.getUniqueId())) {
-
-				if (plot.equals(plotPlayer.getCurrentPlot())) {
-					currentPlot = plotPlayer.getCurrentPlot();
-					plotFound = true;
-					break;
-				}
-
-			}
-
-			if (player.isOp()) {
-				plotFound = true;
-			}
-
-			if (!plotFound) {
-				player.sendMessage(ChatColor.RED + "You can not interact with other people code!");
-				event.setCancelled(true);
-				return;
-			}
-
-		}
-
 		if (block.getType() == Material.OAK_WALL_SIGN) {
 			Sign sign = (Sign) block.getState();
 
 			if (sign.getLine(0).equals(ChatColor.GREEN + "EVENT")) {
 				Inventory inventory = Bukkit.createInventory(null, 9, "Modify Event Block");
 
-				inventory.addItem(GuiUtils.createItem(Material.PAPER, ChatColor.GREEN + "Player Join Plot",
-						ChatColor.GRAY + "This event is fired when a player joins your plot."));
+				inventory.addItem(GuiUtils.createItem(Material.PAPER, ChatColor.GREEN + "Player Join World",
+						ChatColor.GRAY + "This event is fired when a player joins this world."));
 
 				inventory.addItem(GuiUtils.createItem(Material.STICK, ChatColor.GREEN + "Player Interact",
 						ChatColor.GRAY + "This event is fired when:",

@@ -11,10 +11,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
-import com.plotsquared.core.PlotSquared;
-import com.plotsquared.core.player.PlotPlayer;
-import com.plotsquared.core.plot.Plot;
-import com.plotsquared.core.plot.PlotArea;
 import com.windinn.codeblocks.utils.CodeUtils;
 import com.windinn.codeblocks.utils.EventType;
 
@@ -25,31 +21,12 @@ public class BlockBreakListener implements Listener {
 		Player player = event.getPlayer();
 		Block block = event.getBlock();
 
-		PlotPlayer plotPlayer = PlotPlayer.get(player.getName());
-		Plot currentPlot = null;
-		boolean plotFound = false;
-
-		for (Plot plot : PlotSquared.get().getPlots(player.getUniqueId())) {
-
-			if (plot.equals(plotPlayer.getCurrentPlot())) {
-				currentPlot = plotPlayer.getCurrentPlot();
-				plotFound = true;
-				break;
-			}
-
-		}
-
 		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
 
-			if (CodeUtils.execute(player, EventType.PLAYER_BLOCK_BREAK, plotPlayer.getCurrentPlot(),
-					player.getTargetBlock(null, 5))) {
+			if (CodeUtils.execute(player, EventType.PLAYER_BLOCK_BREAK, player.getTargetBlock(null, 5))) {
 				event.setCancelled(true);
 			}
 
-		}
-
-		if (player.isOp()) {
-			plotFound = true;
 		}
 
 		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
@@ -92,24 +69,6 @@ public class BlockBreakListener implements Listener {
 			return;
 		}
 
-		if (!plotFound) {
-			player.sendMessage(ChatColor.RED + "You must code in your own plot!");
-			event.setCancelled(true);
-			return;
-		}
-
-		Location location = event.getBlock().getLocation();
-		PlotArea plotArea = PlotSquared.get().getPlotAreaAbs(new com.plotsquared.core.location.Location(
-				location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-		Plot plot = plotArea.getPlotAbs(new com.plotsquared.core.location.Location(location.getWorld().getName(),
-				location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-
-		if (plot != currentPlot && !player.isOp()) {
-			player.sendMessage(ChatColor.RED + "The location must be located in your plot!");
-			event.setCancelled(true);
-			return;
-		}
-
 		if (event.isCancelled()) {
 			return;
 		}
@@ -124,7 +83,7 @@ public class BlockBreakListener implements Listener {
 					block.getRelative(BlockFace.NORTH).setType(Material.AIR);
 					block.getRelative(BlockFace.EAST).setType(Material.AIR);
 					block.setType(Material.AIR);
-					CodeUtils.removeEvent(block, plotPlayer.getCurrentPlot());
+					CodeUtils.removeEvent(block);
 				}
 
 			}
@@ -186,7 +145,7 @@ public class BlockBreakListener implements Listener {
 						block.setType(Material.AIR);
 						block.getRelative(BlockFace.WEST).setType(Material.AIR);
 						block.getRelative(BlockFace.WEST).getRelative(BlockFace.NORTH).setType(Material.AIR);
-						CodeUtils.removeEvent(block.getRelative(BlockFace.WEST), plotPlayer.getCurrentPlot());
+						CodeUtils.removeEvent(block.getRelative(BlockFace.WEST));
 					}
 
 				}
@@ -288,7 +247,7 @@ public class BlockBreakListener implements Listener {
 					block.getRelative(BlockFace.SOUTH).getRelative(BlockFace.EAST).setType(Material.AIR);
 					block.getRelative(BlockFace.SOUTH).setType(Material.AIR);
 					block.setType(Material.AIR);
-					CodeUtils.removeEvent(block.getRelative(BlockFace.SOUTH), plotPlayer.getCurrentPlot());
+					CodeUtils.removeEvent(block.getRelative(BlockFace.SOUTH));
 				}
 
 			} else if (block.getRelative(BlockFace.SOUTH).getType() == Material.COBBLESTONE) {

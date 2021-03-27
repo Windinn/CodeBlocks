@@ -6,7 +6,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-import com.plotsquared.core.player.PlotPlayer;
 import com.windinn.codeblocks.utils.CodeUtils;
 import com.windinn.codeblocks.utils.EventType;
 
@@ -18,16 +17,10 @@ public class EntityDamageListener implements Listener {
 
 		if (entity instanceof Player) {
 			Player player = (Player) entity;
-			PlotPlayer plotPlayer = PlotPlayer.get(player.getName());
-
-			if (plotPlayer == null) {
-				return;
-			}
 
 			if (!CodeUtils.isCoding.getOrDefault(player, false)) {
 
-				if (CodeUtils.execute(player, EventType.PLAYER_DAMAGE, plotPlayer.getCurrentPlot(),
-						player.getTargetBlock(null, 5))) {
+				if (CodeUtils.execute(player, EventType.PLAYER_DAMAGE, player.getTargetBlock(null, 5))) {
 					event.setCancelled(true);
 				}
 

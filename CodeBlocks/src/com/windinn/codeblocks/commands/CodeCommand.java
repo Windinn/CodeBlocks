@@ -9,9 +9,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.plotsquared.core.PlotSquared;
-import com.plotsquared.core.player.PlotPlayer;
-import com.plotsquared.core.plot.Plot;
 import com.windinn.codeblocks.utils.CodeUtils;
 import com.windinn.codeblocks.utils.GuiUtils;
 
@@ -22,26 +19,6 @@ public class CodeCommand implements CommandExecutor {
 
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
-			PlotPlayer plotPlayer = PlotPlayer.get(player.getName());
-
-			Plot currentPlot = null;
-			boolean plotFound = false;
-
-			for (Plot plot : PlotSquared.get().getPlots(player.getUniqueId())) {
-
-				if (plot.equals(plotPlayer.getCurrentPlot())) {
-					currentPlot = plotPlayer.getCurrentPlot();
-					plotFound = true;
-					break;
-				}
-
-			}
-
-			if (!plotFound && !player.getName().equals("_Minkizz_")) {
-				player.sendMessage(ChatColor.RED + "You must be in your plot to do this!");
-				return false;
-			}
-
 			boolean coding = CodeUtils.isCoding.getOrDefault(player, false);
 
 			if (coding) {

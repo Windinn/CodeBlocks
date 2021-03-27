@@ -21,10 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.PistonBaseMaterial;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.plotsquared.core.PlotSquared;
-import com.plotsquared.core.player.PlotPlayer;
-import com.plotsquared.core.plot.Plot;
-import com.plotsquared.core.plot.PlotArea;
 import com.windinn.codeblocks.CodeBlocks;
 import com.windinn.codeblocks.utils.CodeUtils;
 
@@ -42,24 +38,6 @@ public class BlockPlaceListener implements Listener {
 
 		if (!item.hasItemMeta()) {
 			return;
-		}
-
-		PlotPlayer plotPlayer = PlotPlayer.get(player.getName());
-		Plot currentPlot = null;
-		boolean plotFound = false;
-
-		for (Plot plot : PlotSquared.get().getPlots(player.getUniqueId())) {
-
-			if (plot.equals(plotPlayer.getCurrentPlot())) {
-				currentPlot = plotPlayer.getCurrentPlot();
-				plotFound = true;
-				break;
-			}
-
-		}
-
-		if (player.isOp()) {
-			plotFound = true;
 		}
 
 		if (!CodeUtils.isCoding.getOrDefault(player, false)) {
@@ -94,24 +72,6 @@ public class BlockPlaceListener implements Listener {
 			return;
 		}
 
-		if (!plotFound) {
-			player.sendMessage(ChatColor.RED + "You must code in your own plot!");
-			event.setCancelled(true);
-			return;
-		}
-
-		Location location = event.getBlock().getLocation();
-		PlotArea plotArea = PlotSquared.get().getPlotAreaAbs(new com.plotsquared.core.location.Location(
-				location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-		Plot plot = plotArea.getPlotAbs(new com.plotsquared.core.location.Location(location.getWorld().getName(),
-				location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-
-		if (plot != currentPlot && !player.isOp()) {
-			player.sendMessage(ChatColor.RED + "The location must be located in your plot!");
-			event.setCancelled(true);
-			return;
-		}
-
 		if (event.isCancelled()) {
 			return;
 		}
@@ -140,7 +100,7 @@ public class BlockPlaceListener implements Listener {
 
 			sign.setBlockData(wallSign);
 			sign.update();
-			CodeUtils.addEvent(block, plotPlayer.getCurrentPlot());
+			CodeUtils.addEvent(block);
 		} else if (block.getType() == Material.COBBLESTONE
 				&& item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Action Block")) {
 
@@ -185,16 +145,8 @@ public class BlockPlaceListener implements Listener {
 					int realFinalZ = finalZ;
 
 					Location testLocation = newBlock.getLocation();
-					PlotArea plotArea2 = PlotSquared.get()
-							.getPlotAreaAbs(new com.plotsquared.core.location.Location(
-									testLocation.getWorld().getName(), testLocation.getBlockX(),
-									testLocation.getBlockY(), testLocation.getBlockZ()));
-					Plot plot2 = plotArea2
-							.getPlotAbs(new com.plotsquared.core.location.Location(testLocation.getWorld().getName(),
-									testLocation.getBlockX(), testLocation.getBlockY(), testLocation.getBlockZ()));
 
-					if ((newBlock.getRelative(BlockFace.SOUTH).getType() != Material.AIR)
-							|| (plot2 != currentPlot && !player.isOp())) {
+					if ((newBlock.getRelative(BlockFace.SOUTH).getType() != Material.AIR)) {
 
 						for (Block block2 : oldBlockData.keySet()) {
 							block2.setBlockData(oldBlockData.get(block2));
@@ -296,16 +248,8 @@ public class BlockPlaceListener implements Listener {
 					int realFinalZ = finalZ;
 
 					Location testLocation = newBlock.getLocation();
-					PlotArea plotArea2 = PlotSquared.get()
-							.getPlotAreaAbs(new com.plotsquared.core.location.Location(
-									testLocation.getWorld().getName(), testLocation.getBlockX(),
-									testLocation.getBlockY(), testLocation.getBlockZ()));
-					Plot plot2 = plotArea2
-							.getPlotAbs(new com.plotsquared.core.location.Location(testLocation.getWorld().getName(),
-									testLocation.getBlockX(), testLocation.getBlockY(), testLocation.getBlockZ()));
 
-					if ((newBlock.getRelative(BlockFace.SOUTH).getType() != Material.AIR)
-							|| (plot2 != currentPlot && !player.isOp())) {
+					if ((newBlock.getRelative(BlockFace.SOUTH).getType() != Material.AIR)) {
 
 						for (Block block2 : oldBlockData.keySet()) {
 							block2.setBlockData(oldBlockData.get(block2));
@@ -410,16 +354,8 @@ public class BlockPlaceListener implements Listener {
 					int realFinalZ = finalZ;
 
 					Location testLocation = newBlock.getLocation();
-					PlotArea plotArea2 = PlotSquared.get()
-							.getPlotAreaAbs(new com.plotsquared.core.location.Location(
-									testLocation.getWorld().getName(), testLocation.getBlockX(),
-									testLocation.getBlockY(), testLocation.getBlockZ()));
-					Plot plot2 = plotArea2
-							.getPlotAbs(new com.plotsquared.core.location.Location(testLocation.getWorld().getName(),
-									testLocation.getBlockX(), testLocation.getBlockY(), testLocation.getBlockZ()));
 
-					if ((newBlock.getRelative(BlockFace.SOUTH).getType() != Material.AIR)
-							|| (plot2 != currentPlot && !player.isOp())) {
+					if ((newBlock.getRelative(BlockFace.SOUTH).getType() != Material.AIR)) {
 
 						for (Block block2 : oldBlockData.keySet()) {
 							block2.setBlockData(oldBlockData.get(block2));
@@ -491,89 +427,27 @@ public class BlockPlaceListener implements Listener {
 			int b = block.getRelative(BlockFace.NORTH).getLocation().getBlockZ();
 			Block current = new Location(block.getWorld(), block.getX(), block.getY(), b).getBlock();
 			Map<Block, BlockData> oldBlockData = new HashMap<>();
+			Block newBlock = block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
+					.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH);
+			int lastPistonZ = current.getLocation().getBlockZ() - 3;
+			int lastPistonFoundZ = current.getLocation().getBlockZ() - 1;
 
 			if (current.getType() != Material.AIR) {
-
-				for (int z = b; true; z--) {
-					current = new Location(block.getWorld(), block.getX(), block.getY(), z).getBlock();
-					int finalZ = current.getLocation().getBlockZ() - 5;
-
-					if (current.getType() == Material.AIR) {
-						break;
-					}
-
-					final Block finalCurrent = current;
-					final BlockData blockData = finalCurrent.getBlockData();
-					final Block newBlock1 = new Location(block.getWorld(), block.getX(), block.getY(), finalZ)
-							.getBlock();
-
-					if (newBlock1.getType() == Material.PISTON) {
-						finalZ -= 2;
-					} else if (newBlock1.getType() != Material.AIR) {
-
-						for (Block block2 : oldBlockData.keySet()) {
-							block2.setBlockData(oldBlockData.get(block2));
-						}
-
-						player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
-						event.setCancelled(true);
-						return;
-					}
-
-					final Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), finalZ)
-							.getBlock();
-
-					Location testLocation = newBlock.getLocation();
-					PlotArea plotArea2 = PlotSquared.get()
-							.getPlotAreaAbs(new com.plotsquared.core.location.Location(
-									testLocation.getWorld().getName(), testLocation.getBlockX(),
-									testLocation.getBlockY(), testLocation.getBlockZ()));
-					Plot plot2 = plotArea2
-							.getPlotAbs(new com.plotsquared.core.location.Location(testLocation.getWorld().getName(),
-									testLocation.getBlockX(), testLocation.getBlockY(), testLocation.getBlockZ()));
-
-					if (plot2 != currentPlot) {
-
-						for (Block block2 : oldBlockData.keySet()) {
-							block2.setBlockData(oldBlockData.get(block2));
-						}
-
-						player.sendMessage(ChatColor.RED + "There is not enough place to place it here!");
-						event.setCancelled(true);
-						return;
-					}
-
-					final int realFinalZ = finalZ;
-
-					Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(CodeBlocks.class), new Runnable() {
-
-						@Override
-						public void run() {
-							Block newBlock = new Location(block.getWorld(), block.getX(), block.getY(), realFinalZ)
-									.getBlock();
-							newBlock.setBlockData(blockData);
-							finalCurrent.setType(Material.STONE);
-						}
-
-					}, 1L);
-
-					if (i == 256) {
-						break;
-					}
-
-					i++;
-				}
-
+				player.sendMessage(ChatColor.RED
+						+ "For the moment, you cannot add multiple conditions in a code! (Will be added soon!)");
+				event.setCancelled(true);
+				return;
 			}
 
 			block.getRelative(BlockFace.UP).setType(Material.CHEST);
 			block.getRelative(BlockFace.NORTH).setType(Material.STONE);
 			block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).setType(Material.PISTON);
-			block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
-					.getRelative(BlockFace.NORTH).setType(Material.PISTON);
 
-			BlockState pistonState = block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
-					.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH).getState();
+			new Location(block.getWorld(), block.getX(), block.getY(), current.getZ() - 3).getBlock()
+					.setType(Material.PISTON);
+
+			BlockState pistonState = new Location(block.getWorld(), block.getX(), block.getY(), current.getZ() - 3)
+					.getBlock().getState();
 			PistonBaseMaterial piston = (PistonBaseMaterial) pistonState.getData();
 
 			piston.setFacingDirection(BlockFace.SOUTH);
