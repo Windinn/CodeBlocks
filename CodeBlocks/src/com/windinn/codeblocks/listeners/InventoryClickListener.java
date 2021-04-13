@@ -49,6 +49,16 @@ public class InventoryClickListener implements Listener {
 				sign.setLine(2, ChatColor.WHITE + "Creative");
 
 				sign.update();
+			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Set Gamemode to Adventure")) {
+				sign.setLine(1, ChatColor.WHITE + "Set gamemode to:");
+				sign.setLine(2, ChatColor.WHITE + "Adventure");
+
+				sign.update();
+			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Set Gamemode to Spectator")) {
+				sign.setLine(1, ChatColor.WHITE + "Set gamemode to:");
+				sign.setLine(2, ChatColor.WHITE + "Spectator");
+
+				sign.update();
 			} else if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + "Send Message")) {
 				sign.setLine(1, ChatColor.WHITE + "Send Message");
 				sign.setLine(2, null);

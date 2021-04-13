@@ -23,7 +23,7 @@ public class PlayCommand implements CommandExecutor {
 			player.setGameMode(GameMode.CREATIVE);
 			player.sendMessage(ChatColor.GREEN + "You entered play mode.");
 
-			CodeUtils.execute(player, EventType.PLAYER_JOIN_WORLD, player.getTargetBlock(null, 5));
+			CodeUtils.execute(player, EventType.PLAYER_JOIN_PLOT, player.getTargetBlock(null, 5));
 		}
 
 		return false;

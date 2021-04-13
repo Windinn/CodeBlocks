@@ -111,19 +111,19 @@ public class PlayerInteractListener implements Listener {
 									Location location = event.getClickedBlock().getLocation();
 
 									ItemMeta meta = item.getItemMeta();
-									meta.setDisplayName(ChatColor.RESET + LocationUtils
-											.simpleLocationToString(event.getClickedBlock().getLocation()));
+									meta.setDisplayName(ChatColor.RESET
+											+ LocationUtils.locationToString(event.getClickedBlock().getLocation()));
 									item.setItemMeta(meta);
 									player.sendMessage(ChatColor.GREEN + "The location value has been set to "
-											+ LocationUtils.simpleLocationToString(location));
+											+ LocationUtils.locationToString(location));
 									event.setCancelled(true);
 								} else if (event.getAction() == Action.RIGHT_CLICK_AIR) {
 									ItemMeta meta = item.getItemMeta();
-									meta.setDisplayName(ChatColor.RESET
-											+ LocationUtils.simpleLocationToString(player.getLocation()));
+									meta.setDisplayName(
+											ChatColor.RESET + LocationUtils.locationToString(player.getLocation()));
 									item.setItemMeta(meta);
 									player.sendMessage(ChatColor.GREEN + "The location value has been set to "
-											+ LocationUtils.simpleLocationToString(player.getLocation()));
+											+ LocationUtils.locationToString(player.getLocation()));
 									event.setCancelled(true);
 								}
 
@@ -230,10 +230,16 @@ public class PlayerInteractListener implements Listener {
 				Inventory inventory = Bukkit.createInventory(null, 18, "Modify Action Block");
 
 				inventory.addItem(GuiUtils.createItem(Material.PAPER, ChatColor.GREEN + "Set Gamemode to Survival",
-						ChatColor.GRAY + "This action sets the gamemode of the player to survival."));
+						ChatColor.GRAY + "This action sets the gamemode of the player to Survival."));
 
 				inventory.addItem(GuiUtils.createItem(Material.PAPER, ChatColor.GREEN + "Set Gamemode to Creative",
-						ChatColor.GRAY + "This action sets the gamemode of the player to creative."));
+						ChatColor.GRAY + "This action sets the gamemode of the player to Creative."));
+
+				inventory.addItem(GuiUtils.createItem(Material.PAPER, ChatColor.GREEN + "Set Gamemode to Adventure",
+						ChatColor.GRAY + "This action sets the gamemode of the player to Adventure."));
+
+				inventory.addItem(GuiUtils.createItem(Material.PAPER, ChatColor.GREEN + "Set Gamemode to Spectator",
+						ChatColor.GRAY + "This action sets the gamemode of the player to Spectator."));
 
 				inventory.addItem(GuiUtils.createItem(Material.BOOK, ChatColor.GREEN + "Send Message",
 						ChatColor.GRAY + "This action sends a Text Value to the player.",

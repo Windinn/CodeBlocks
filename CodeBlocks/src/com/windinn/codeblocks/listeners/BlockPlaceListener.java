@@ -144,8 +144,6 @@ public class BlockPlaceListener implements Listener {
 
 					int realFinalZ = finalZ;
 
-					Location testLocation = newBlock.getLocation();
-
 					if ((newBlock.getRelative(BlockFace.SOUTH).getType() != Material.AIR)) {
 
 						for (Block block2 : oldBlockData.keySet()) {
@@ -246,8 +244,6 @@ public class BlockPlaceListener implements Listener {
 							.getBlock();
 
 					int realFinalZ = finalZ;
-
-					Location testLocation = newBlock.getLocation();
 
 					if ((newBlock.getRelative(BlockFace.SOUTH).getType() != Material.AIR)) {
 
@@ -353,8 +349,6 @@ public class BlockPlaceListener implements Listener {
 
 					int realFinalZ = finalZ;
 
-					Location testLocation = newBlock.getLocation();
-
 					if ((newBlock.getRelative(BlockFace.SOUTH).getType() != Material.AIR)) {
 
 						for (Block block2 : oldBlockData.keySet()) {
@@ -423,14 +417,8 @@ public class BlockPlaceListener implements Listener {
 				return;
 			}
 
-			int i = 0;
 			int b = block.getRelative(BlockFace.NORTH).getLocation().getBlockZ();
 			Block current = new Location(block.getWorld(), block.getX(), block.getY(), b).getBlock();
-			Map<Block, BlockData> oldBlockData = new HashMap<>();
-			Block newBlock = block.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH)
-					.getRelative(BlockFace.NORTH).getRelative(BlockFace.NORTH);
-			int lastPistonZ = current.getLocation().getBlockZ() - 3;
-			int lastPistonFoundZ = current.getLocation().getBlockZ() - 1;
 
 			if (current.getType() != Material.AIR) {
 				player.sendMessage(ChatColor.RED

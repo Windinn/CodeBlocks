@@ -21,6 +21,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.plotsquared.bukkit.util.BukkitUtil;
+import com.plotsquared.core.player.PlotPlayer;
+import com.plotsquared.core.plot.Plot;
+
 public final class CodeUtils {
 
 	public static Map<Player, Block> savedSigns;
@@ -44,7 +48,14 @@ public final class CodeUtils {
 			locations = new ArrayList<>();
 		}
 
-		String loc = LocationUtils.simpleLocationToString(block.getLocation());
+		Plot plot = BukkitUtil.getPlot(block.getLocation());
+
+		if (plot == null) {
+			return;
+		}
+
+		String loc = LocationUtils.simpleLocationToString(
+				new SimpleLocation(plot.getId().getX(), plot.getId().getY(), block.getLocation()));
 
 		if (!locations.contains(loc)) {
 			locations.add(loc);
@@ -60,9 +71,9 @@ public final class CodeUtils {
 
 		while (iterator.hasNext()) {
 			String locationStr = iterator.next();
-			Location location = LocationUtils.simpleStringToLocation(locationStr);
+			SimpleLocation location = LocationUtils.simpleStringToLocation(locationStr);
 
-			if (location.equals(block.getLocation())) {
+			if (location.getLocation().equals(block.getLocation())) {
 				iterator.remove();
 			}
 
@@ -84,31 +95,37 @@ public final class CodeUtils {
 
 	public static boolean execute(Player player, EventType event, Block targetBlock) {
 		boolean cancel = false;
+		PlotPlayer<Player> plotPlayer = BukkitUtil.getPlayer(player);
 
 		for (String eventBlock : getEvents()) {
-			Location loc = LocationUtils.simpleStringToLocation(eventBlock);
+			SimpleLocation loc = LocationUtils.simpleStringToLocation(eventBlock);
 
-			if (!loc.getWorld().equals(player.getWorld())) {
+			if (!loc.getLocation().getWorld().equals(player.getWorld())) {
 				continue;
 			}
 
-			if (loc.getBlock().getType() != Material.DIAMOND_BLOCK) {
-				removeEvent(loc.getBlock());
+			if (loc.getPlotX() != plotPlayer.getCurrentPlot().getId().getX()
+					|| loc.getPlotY() != plotPlayer.getCurrentPlot().getId().getY()) {
 				continue;
 			}
 
-			Block eventSignBlock = loc.getBlock().getRelative(BlockFace.EAST);
+			if (loc.getLocation().getBlock().getType() != Material.DIAMOND_BLOCK) {
+				removeEvent(loc.getLocation().getBlock());
+				continue;
+			}
+
+			Block eventSignBlock = loc.getLocation().getBlock().getRelative(BlockFace.EAST);
 
 			if (eventSignBlock.getType() != Material.OAK_WALL_SIGN) {
-				removeEvent(loc.getBlock());
+				removeEvent(loc.getLocation().getBlock());
 				continue;
 			}
 
 			Sign eventSign = (Sign) eventSignBlock.getState();
 			boolean pass = false;
 
-			if (event == EventType.PLAYER_JOIN_WORLD
-					&& eventSign.getLine(1).equals(ChatColor.WHITE + "Player Join World")) {
+			if (event == EventType.PLAYER_JOIN_PLOT
+					&& eventSign.getLine(1).equals(ChatColor.WHITE + "Player Join Plot")) {
 				pass = true;
 			} else if (event == EventType.PLAYER_INTERACT
 					&& eventSign.getLine(1).equals(ChatColor.WHITE + "Player Interact")) {
@@ -137,8 +154,9 @@ public final class CodeUtils {
 			boolean canExecute = true;
 			int x = 0;
 
-			for (int z = loc.getBlockZ(); true; z--) {
-				Block block = new Location(loc.getWorld(), loc.getX(), loc.getY(), z).getBlock();
+			for (int z = loc.getLocation().getBlockZ(); true; z--) {
+				Block block = new Location(loc.getLocation().getWorld(), loc.getLocation().getX(),
+						loc.getLocation().getY(), z).getBlock();
 
 				if (block.getType() == Material.PISTON) {
 					conditionX--;
@@ -273,7 +291,7 @@ public final class CodeUtils {
 
 				}
 
-				Location location = LocationUtils.simpleStringToLocation(locationString);
+				Location location = LocationUtils.stringToLocation(locationString);
 
 				if (location == null) {
 
@@ -295,7 +313,7 @@ public final class CodeUtils {
 
 				}
 
-				if (LocationUtils.simpleLocationToString(targetBlock.getLocation()).equals(locationString)) {
+				if (LocationUtils.locationToString(targetBlock.getLocation()).equals(locationString)) {
 
 					if (inversed) {
 						return false;
@@ -378,6 +396,10 @@ public final class CodeUtils {
 				player.setGameMode(GameMode.SURVIVAL);
 			} else if (sign.getLine(2).equals(ChatColor.WHITE + "Creative")) {
 				player.setGameMode(GameMode.CREATIVE);
+			} else if (sign.getLine(2).equals(ChatColor.WHITE + "Adventure")) {
+				player.setGameMode(GameMode.ADVENTURE);
+			} else if (sign.getLine(2).equals(ChatColor.WHITE + "Spectator")) {
+				player.setGameMode(GameMode.SPECTATOR);
 			}
 
 		} else if (sign.getLine(1).equals(ChatColor.WHITE + "Send Message")) {
@@ -426,8 +448,7 @@ public final class CodeUtils {
 					return;
 				}
 
-				location = LocationUtils
-						.simpleStringToLocation(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
+				location = LocationUtils.stringToLocation(ChatColor.stripColor(item.getItemMeta().getDisplayName()));
 
 				if (location == null) {
 					return;
